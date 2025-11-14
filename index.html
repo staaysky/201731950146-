@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页版围棋游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>围棋游戏</h1>
+        </header>
+        
+        <main>
+            <div class="game-info">
+                <div class="current-player">
+                    当前玩家: <span id="current-player">黑棋</span>
+                </div>
+                <div class="score">
+                    黑棋提子: <span id="black-captures">0</span> | 
+                    白棋提子: <span id="white-captures">0</span>
+                </div>
+                <div class="controls">
+                    <button id="pass-btn">虚手</button>
+                    <button id="restart-btn">重新开始</button>
+                    <button id="undo-btn">悔棋</button>
+                </div>
+            </div>
+            
+            <div class="board-container">
+                <canvas id="go-board" width="760" height="760"></canvas>
+            </div>
+            
+            <div class="game-status">
+                <div id="message-area"></div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
