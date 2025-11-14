@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>围棋游戏</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f5dc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #dcb35c;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .game-info {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .current-player {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .score {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .board-container {
+            position: relative;
+            background-color: #dcb35c;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(19, 30px);
+            grid-template-rows: repeat(19, 30px);
+            gap: 0;
+            background-color: #dcb35c;
+            position: relative;
+        }
+        
+        .intersection {
+            width: 30px;
+            height: 30px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .intersection::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #000;
+        }
+        
+        .intersection::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: #000;
+        }
+        
+        .intersection:hover::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.5;
+        }
+        
+        .black:hover::before {
+            background-color: #000;
+        }
+        
+        .white:hover::before {
+            background-color: #fff;
+            border: 1px solid #000;
+        }
+        
+        .stone {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+        
+        .black-stone {
+            background-color: #000;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .white-stone {
+            background-color: #fff;
+            border: 1px solid #000;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #8b4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #a0522d;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        .star-point {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #000;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-info">
+            <div class="current-player">当前玩家: <span id="current-player">黑棋</span></div>
+            <div class="score">黑棋提子: <span id="black-captures">0</span> | 白棋提子: <span id="white-captures">0</span></div>
+        </div>
+        
+        <div class="board-container">
+            <div id="board" class="board"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="new-game">新游戏</button>
+            <button id="pass">虚手</button>
+            <button id="resign">认输</button>
+        </div>
+    </div>
+
+    <script>
+        class GoGame {
+            constructor() {
+                this.boardSize = 19;
+                this.board = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(null));
+                this.currentPlayer = 'black';
+                this.blackCaptures = 0;
+                this.whiteCaptures = 0;
+                this.lastMove = null;
+                this.koPoint = null;
+                this.passCount = 0;
+                
+                this.initializeBoard();
+                this.bindEvents();
+            }
+            
+            initializeBoard() {
+                const boardElement = document.getElementById('board');
+                boardElement.innerHTML = '';
+                
+                for (let row = 0; row < this.boardSize; row++) {
+                    for (let col = 0; col < this.boardSize; col++) {
+                        const intersection = document.createElement('div');
+                        intersection.className = 'intersection';
+                        intersection.dataset.row = row;
+                        intersection.dataset.col = col;
+                        
+                        // 添加星位
+                        if (this.isStarPoint(row, col)) {
+                            const starPoint = document.createElement('div');
+                            starPoint.className = 'star-point';
+                            intersection.appendChild(starPoint);
+                        }
+                        
+                        intersection.addEventListener('click', (e) => this.handleMove(e));
+                        boardElement.appendChild(intersection);
+                    }
+                }
+            }
+            
+            isStarPoint(row, col) {
+                const starPoints = [
+                    [3, 3], [3, 9], [3, 15],
+                    [9, 3], [9, 9], [9, 15],
+                    [15, 3], [15, 9], [15, 15]
+                ];
+                
+                return starPoints.some(point => point[0] === row && point[1] === col);
+            }
+            
+            handleMove(event) {
+                const row = parseInt(event.currentTarget.dataset.row);
+                const col = parseInt(event.currentTarget.dataset.col);
+                
+                if (this.makeMove(row, col)) {
+                    this.renderBoard();
+                    this.updateGameInfo();
+                }
+            }
+            
+            makeMove(row, col) {
+                if (this.board[row][col] !== null) {
+                    return false;
+                }
+                
+                // 检查是否是劫
+                if (this.koPoint && this.koPoint[0] === row && this.koPoint[1] === col) {
+                    return false;
+                }
+                
+                // 放置棋子
+                this.board[row][col] = this.currentPlayer;
+                this.passCount = 0;
+                
+                // 检查并提取对手的死子
+                const opponent = this.currentPlayer === 'black' ? 'white' : 'black';
+                const capturedGroups = this.getCapturedGroups(opponent);
+                
+                if (capturedGroups.length > 0) {
+                    this.removeGroups(capturedGroups);
+                    if (this.currentPlayer === 'black') {
+                        this.blackCaptures += this.countStones(capturedGroups);
+                    } else {
+                        this.whiteCaptures += this.countStones(capturedGroups);
+                    }
+                }
+                
+                // 检查自杀规则
+                const selfGroup = this.getGroup(row, col);
+                if (!this.hasLiberties(selfGroup)) {
+                    // 如果没有提子，且自己的棋子没有气，则不能下
+                    if (capturedGroups.length === 0) {
+                        this.board[row][col] = null;
+                        return false;
+                    }
+                }
+                
+                // 检查劫的情况
+                if (capturedGroups.length === 1 && this.countStones(capturedGroups) === 1) {
+                    const capturedStone = capturedGroups[0][0];
+                    const selfGroupSize = selfGroup.length;
+                    
+                    if (selfGroupSize === 1) {
+                        this.koPoint = capturedStone;
+                    } else {
+                        this.koPoint = null;
+                    }
+                } else {
+                    this.koPoint = null;
+                }
+                
+                this.lastMove = [row, col];
+                this.currentPlayer = opponent;
+                
+                return true;
+            }
+            
+            getGroup(row, col) {
+                const color = this.board[row][col];
+                if (color === null) return null;
+                
+                const group = [];
+                const visited = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(false));
+                
+                const dfs = (r, c) => {
+                    if (r < 0 || r >= this.boardSize || c < 0 || c >= this.boardSize) return;
+                    if (visited[r][c] || this.board[r][c] !== color) return;
+                    
+                    visited[r][c] = true;
+                    group.push([r, c]);
+                    
+                    dfs(r + 1, c);
+                    dfs(r - 1, c);
+                    dfs(r, c + 1);
+                    dfs(r, c - 1);
+                };
+                
+                dfs(row, col);
+                return group;
+            }
+            
+            getLiberties(group) {
+                const liberties = new Set();
+                
+                for (const [row, col] of group) {
+                    const neighbors = [
+                        [row + 1, col],
+                        [row - 1, col],
+                        [row, col + 1],
+                        [row, col - 1]
+                    ];
+                    
+                    for (const [r, c] of neighbors) {
+                        if (r >= 0 && r < this.boardSize && c >= 0 && c < this.boardSize && this.board[r][c] === null) {
+                            liberties.add(`${r},${c}`);
+                        }
+                    }
+                }
+                
+                return Array.from(liberties);
+            }
+            
+            hasLiberties(group) {
+                return this.getLiberties(group).length > 0;
+            }
+            
+            getCapturedGroups(color) {
+                const capturedGroups = [];
+                const visited = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(false));
+                
+                for (let row = 0; row < this.boardSize; row++) {
+                    for (let col = 0; col < this.boardSize; col++) {
+                        if (this.board[row][col] === color && !visited[row][col]) {
+                            const group = this.getGroup(row, col);
+                            
+                            for (const [r, c] of group) {
+                                visited[r][c] = true;
+                            }
+                            
+                            if (!this.hasLiberties(group)) {
+                                capturedGroups.push(group);
+                            }
+                        }
+                    }
+                }
+                
+                return capturedGroups;
+            }
+            
+            removeGroups(groups) {
+                for (const group of groups) {
+                    for (const [row, col] of group) {
+                        this.board[row][col] = null;
+                    }
+                }
+            }
+            
+            countStones(groups) {
+                return groups.reduce((total, group) => total + group.length, 0);
+            }
+            
+            pass() {
+                this.passCount++;
+                this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
+                this.koPoint = null;
+                
+                if (this.passCount >= 2) {
+                    this.endGame();
+                }
+                
+                this.updateGameInfo();
+            }
+            
+            resign() {
+                const winner = this.currentPlayer === 'black' ? '白棋' : '黑棋';
+                alert(`${winner}获胜！${this.currentPlayer === 'black' ? '黑棋' : '白棋'}认输。`);
+                this.newGame();
+            }
+            
+            endGame() {
+                // 简单的终局处理，实际应该计算领地
+                alert('游戏结束！');
+            }
+            
+            newGame() {
+                this.board = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(null));
+                this.currentPlayer = 'black';
+                this.blackCaptures = 0;
+                this.whiteCaptures = 0;
+                this.lastMove = null;
+                this.koPoint = null;
+                this.passCount = 0;
+                
+                this.renderBoard();
+                this.updateGameInfo();
+            }
+            
+            renderBoard() {
+                const intersections = document.querySelectorAll('.intersection');
+                
+                intersections.forEach(intersection => {
+                    const row = parseInt(intersection.dataset.row);
+                    const col = parseInt(intersection.dataset.col);
+                    
+                    // 移除现有棋子
+                    const existingStone = intersection.querySelector('.stone');
+                    if (existingStone) {
+                        existingStone.remove();
+                    }
+                    
+                    // 添加新棋子
+                    if (this.board[row][col]) {
+                        const stone = document.createElement('div');
+                        stone.className = `stone ${this.board[row][col]}-stone`;
+                        intersection.appendChild(stone);
+                    }
+                    
+                    // 更新悬停样式
+                    intersection.classList.remove('black', 'white');
+                    if (this.board[row][col] === null) {
+                        intersection.classList.add(this.currentPlayer);
+                    }
+                });
+            }
+            
+            updateGameInfo() {
+                document.getElementById('current-player').textContent = this.currentPlayer === 'black' ? '黑棋' : '白棋';
+                document.getElementById('black-captures').textContent = this.blackCaptures;
+                document.getElementById('white-captures').textContent = this.whiteCaptures;
+            }
+            
+            bindEvents() {
+                document.getElementById('new-game').addEventListener('click', () => this.newGame());
+                document.getElementById('pass').addEventListener('click', () => this.pass());
+                document.getElementById('resign').addEventListener('click', () => this.resign());
+            }
+        }
+        
+        // 初始化游戏
+        const game = new GoGame();
+    </script>
+</body>
+</html>
