@@ -3,17 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>坦克大战</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>坦克大战</h1>
+            <div class="game-info">
+                <div id="score">得分: 0</div>
+                <div id="lives">生命: 3</div>
+                <button id="restart-btn">重新开始</button>
+            </div>
         </div>
-        <div class="game-board" id="game-board"></div>
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        <div class="controls">
+            <p>使用 WASD 移动，空格键开火</p>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
