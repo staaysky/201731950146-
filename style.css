@@ -1,3 +1,4 @@
+/* CSS Reset and basic styles */
 * {
     margin: 0;
     padding: 0;
@@ -5,27 +6,151 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f5f5dc;
+    color: #333;
 }
 
 .container {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 h1 {
-    color: #333;
+    text-align: center;
     margin-bottom: 20px;
+    color: #8b4513;
     font-size: 2.5em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #deb887;
+    border-radius: 5px;
+}
+
+#current-player {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#restart-btn {
+    padding: 8px 16px;
+    background-color: #8b4513;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+#restart-btn:hover {
+    background-color: #a0522d;
+}
+
+.chessboard {
+    position: relative;
+    width: 540px;
+    height: 600px;
+    margin: 0 auto;
+    background-color: #f4a460;
+    border: 3px solid #8b4513;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.board-lines {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    width: 480px;
+    height: 540px;
+}
+
+.horizontal-line {
+    position: absolute;
+    width: 480px;
+    height: 1px;
+    background-color: #8b4513;
+}
+
+.vertical-line {
+    position: absolute;
+    width: 1px;
+    height: 540px;
+    background-color: #8b4513;
+}
+
+.river {
+    position: absolute;
+    top: 270px;
+    left: 0;
+    width: 480px;
+    height: 1px;
+    background-color: #8b4513;
+}
+
+.river-text {
+    position: absolute;
+    top: 250px;
+    left: 200px;
+    font-size: 24px;
+    color: #8b4513;
+    font-weight: bold;
+}
+
+.chess-piece {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid #8b4513;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.red-piece {
+    background-color: #ff6347;
+    color: white;
+}
+
+.black-piece {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.selected {
+    box-shadow: 0 0 10px yellow;
+    transform: scale(1.1);
+}
+
+.valid-move {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(0, 255, 0, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.board-point {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .game-info {
