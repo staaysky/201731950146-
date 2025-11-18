@@ -3,17 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>飞行棋游戏</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>五子棋游戏</h1>
+        <h1>飞行棋游戏</h1>
         <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
+            <div id="current-player">当前玩家: 红色</div>
+            <button id="roll-dice-btn">掷骰子</button>
             <button id="restart-btn">重新开始</button>
+            <div id="dice-result">骰子点数: -</div>
         </div>
         <div class="game-board" id="game-board"></div>
+        <div class="players-info">
+            <div class="player-info red">红色玩家: <span id="red-pieces">4</span> 枚棋子</div>
+            <div class="player-info yellow">黄色玩家: <span id="yellow-pieces">4</span> 枚棋子</div>
+            <div class="player-info blue">蓝色玩家: <span id="blue-pieces">4</span> 枚棋子</div>
+            <div class="player-info green">绿色玩家: <span id="green-pieces">4</span> 枚棋子</div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
