@@ -61,72 +61,121 @@ h1 {
 }
 
 .game-board {
-    display: grid;
-    grid-template-columns: repeat(15, 35px);
-    grid-template-rows: repeat(15, 35px);
-    gap: 1px;
-    background: #8b4513;
-    padding: 10px;
+    position: relative;
+    width: 540px;
+    height: 600px;
+    background: #f4d03f;
+    border: 3px solid #8b4513;
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     margin: 0 auto;
-    width: fit-content;
+}
+
+.board-lines {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    width: 480px;
+    height: 540px;
+}
+
+.horizontal-line {
+    position: absolute;
+    width: 480px;
+    height: 1px;
+    background: #8b4513;
+}
+
+.vertical-line {
+    position: absolute;
+    width: 1px;
+    height: 540px;
+    background: #8b4513;
+}
+
+.river {
+    position: absolute;
+    top: 240px;
+    left: 0;
+    width: 480px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: #8b4513;
+    font-weight: bold;
+}
+
+.palace-line {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: #8b4513;
 }
 
 .cell {
-    background: #deb887;
-    border: 1px solid #8b4513;
+    position: absolute;
+    width: 60px;
+    height: 60px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.3s ease;
-    position: relative;
+    z-index: 10;
 }
 
 .cell:hover {
-    background: #f4e4c1;
-}
-
-.cell.disabled {
-    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
 }
 
 .piece {
-    width: 28px;
-    height: 28px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.black {
-    background: radial-gradient(circle at 30% 30%, #444, #000);
+.red-piece {
+    background: linear-gradient(145deg, #ff6b6b, #cc0000);
+    color: white;
+    border: 2px solid #990000;
 }
 
-.white {
-    background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+.black-piece {
+    background: linear-gradient(145deg, #444, #000);
+    color: white;
+    border: 2px solid #222;
 }
 
-.winning-piece {
+.selected {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
+
+.valid-move {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 50%;
     animation: pulse 1s infinite;
 }
 
 @keyframes pulse {
     0% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        transform: scale(1);
     }
     50% {
-        transform: translate(-50%, -50%) scale(1.1);
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        transform: scale(1.1);
     }
     100% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        transform: scale(1);
     }
 }
 
