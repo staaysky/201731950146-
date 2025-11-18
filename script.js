@@ -1,199 +1,328 @@
-class Gomoku {
+class PlaneWarGame {
     constructor() {
-        this.boardSize = 15;
-        this.board = [];
-        this.currentPlayer = 'black';
+        this.gameArea = document.getElementById('game-area');
+        this.playerPlane = document.getElementById('player-plane');
+        this.scoreElement = document.getElementById('score');
+        this.livesElement = document.getElementById('lives');
+        this.gameOverElement = document.getElementById('game-over');
+        this.finalScoreElement = document.getElementById('final-score');
+        
+        this.score = 0;
+        this.lives = 3;
         this.gameOver = false;
-        this.winningCells = [];
+        this.playerX = 175;
+        this.bullets = [];
+        this.enemies = [];
+        this.explosions = [];
+        
+        this.gameLoop = null;
+        this.enemySpawnInterval = null;
+        this.bulletInterval = null;
         
         this.init();
     }
 
     init() {
-        this.createBoard();
-        this.renderBoard();
+        this.createStars();
         this.attachEventListeners();
-        this.updatePlayerDisplay();
+        this.startGame();
     }
 
-    createBoard() {
-        this.board = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(null));
-    }
-
-    renderBoard() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.innerHTML = '';
+    createStars() {
+        const starsContainer = document.createElement('div');
+        starsContainer.className = 'stars';
         
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-                
-                if (this.board[row][col]) {
-                    const piece = document.createElement('div');
-                    piece.className = `piece ${this.board[row][col]}`;
-                    
-                    if (this.winningCells.some(([r, c]) => r === row && c === col)) {
-                        piece.classList.add('winning-piece');
-                    }
-                    
-                    cell.appendChild(piece);
-                    cell.classList.add('disabled');
-                }
-                
-                boardElement.appendChild(cell);
-            }
+        for (let i = 0; i < 20; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 400 + 'px';
+            star.style.top = Math.random() * 600 + 'px';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
         }
+        
+        this.gameArea.appendChild(starsContainer);
     }
 
     attachEventListeners() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.addEventListener('click', (e) => {
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
             if (this.gameOver) return;
             
-            const cell = e.target.closest('.cell');
-            if (!cell || cell.classList.contains('disabled')) return;
-            
-            const row = parseInt(cell.dataset.row);
-            const col = parseInt(cell.dataset.col);
-            
-            this.placePiece(row, col);
+            if (e.key === 'ArrowLeft' && this.playerX > 0) {
+                this.playerX -= 20;
+                this.updatePlayerPosition();
+            } else if (e.key === 'ArrowRight' && this.playerX < 350) {
+                this.playerX += 20;
+                this.updatePlayerPosition();
+            }
         });
 
+        // 鼠标控制
+        this.gameArea.addEventListener('mousemove', (e) => {
+            if (this.gameOver) return;
+            
+            const rect = this.gameArea.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            this.playerX = Math.max(0, Math.min(350, x - 25));
+            this.updatePlayerPosition();
+        });
+
+        // 重新开始按钮
         document.getElementById('restart-btn').addEventListener('click', () => {
+            this.restart();
+        });
+        
+        document.getElementById('restart-btn-2').addEventListener('click', () => {
             this.restart();
         });
     }
 
-    placePiece(row, col) {
-        if (this.board[row][col] !== null) return;
-        
-        this.board[row][col] = this.currentPlayer;
-        
-        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        const piece = document.createElement('div');
-        piece.className = `piece ${this.currentPlayer}`;
-        cell.appendChild(piece);
-        cell.classList.add('disabled');
-        
-        if (this.checkWin(row, col)) {
-            this.gameOver = true;
-            this.highlightWinningPieces();
-            this.showMessage(`${this.currentPlayer === 'black' ? '黑棋' : '白棋'} 获胜！`);
-            return;
-        }
-        
-        if (this.checkDraw()) {
-            this.gameOver = true;
-            this.showMessage('平局！');
-            return;
-        }
-        
-        this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
-        this.updatePlayerDisplay();
+    updatePlayerPosition() {
+        this.playerPlane.style.left = this.playerX + 'px';
     }
 
-    checkWin(row, col) {
-        const directions = [
-            [0, 1],   // 水平
-            [1, 0],   // 垂直
-            [1, 1],   // 对角线
-            [1, -1]   // 反对角线
-        ];
+    startGame() {
+        this.gameOver = false;
+        this.score = 0;
+        this.lives = 3;
+        this.playerX = 175;
+        this.updatePlayerPosition();
+        this.updateUI();
         
-        for (const [dx, dy] of directions) {
-            const cells = this.getLineCells(row, col, dx, dy);
-            if (cells.length >= 5) {
-                this.winningCells = cells;
-                return true;
-            }
-        }
+        // 游戏主循环
+        this.gameLoop = setInterval(() => {
+            this.update();
+        }, 1000 / 60);
         
-        return false;
+        // 生成敌机
+        this.enemySpawnInterval = setInterval(() => {
+            this.spawnEnemy();
+        }, 1500);
+        
+        // 自动发射子弹
+        this.bulletInterval = setInterval(() => {
+            this.shootBullet();
+        }, 500);
     }
 
-    getLineCells(row, col, dx, dy) {
-        const player = this.board[row][col];
-        const cells = [[row, col]];
+    update() {
+        this.updateBullets();
+        this.updateEnemies();
+        this.updateExplosions();
+        this.checkCollisions();
+    }
+
+    spawnEnemy() {
+        if (this.gameOver) return;
         
-        // 正向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row + i * dx;
-            const newCol = col + i * dy;
+        const enemy = document.createElement('div');
+        enemy.className = 'enemy-plane';
+        enemy.style.left = Math.random() * 360 + 'px';
+        enemy.style.top = '-40px';
+        
+        this.gameArea.appendChild(enemy);
+        this.enemies.push({
+            element: enemy,
+            x: parseFloat(enemy.style.left),
+            y: -40,
+            speed: 2 + Math.random() * 2
+        });
+    }
+
+    shootBullet() {
+        if (this.gameOver) return;
+        
+        const bullet = document.createElement('div');
+        bullet.className = 'bullet';
+        bullet.style.left = (this.playerX + 23) + 'px';
+        bullet.style.bottom = '60px';
+        
+        this.gameArea.appendChild(bullet);
+        this.bullets.push({
+            element: bullet,
+            x: this.playerX + 23,
+            y: 540,
+            speed: 8
+        });
+    }
+
+    updateBullets() {
+        this.bullets = this.bullets.filter(bullet => {
+            bullet.y -= bullet.speed;
+            bullet.element.style.bottom = (600 - bullet.y) + 'px';
             
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
+            if (bullet.y < -15) {
+                this.gameArea.removeChild(bullet.element);
+                return false;
             }
-        }
-        
-        // 反向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row - i * dx;
-            const newCol = col - i * dy;
             
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
+            return true;
+        });
+    }
+
+    updateEnemies() {
+        this.enemies = this.enemies.filter(enemy => {
+            enemy.y += enemy.speed;
+            enemy.element.style.top = enemy.y + 'px';
+            
+            if (enemy.y > 640) {
+                this.gameArea.removeChild(enemy.element);
+                this.lives--;
+                this.updateUI();
+                
+                if (this.lives <= 0) {
+                    this.endGame();
+                }
+                
+                return false;
             }
-        }
-        
-        return cells;
+            
+            return true;
+        });
     }
 
-    isValidPosition(row, col) {
-        return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
+    updateExplosions() {
+        this.explosions = this.explosions.filter(explosion => {
+            explosion.life--;
+            
+            if (explosion.life <= 0) {
+                this.gameArea.removeChild(explosion.element);
+                return false;
+            }
+            
+            return true;
+        });
     }
 
-    checkDraw() {
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                if (this.board[row][col] === null) {
-                    return false;
+    checkCollisions() {
+        // 检查子弹与敌机的碰撞
+        for (let i = this.bullets.length - 1; i >= 0; i--) {
+            const bullet = this.bullets[i];
+            
+            for (let j = this.enemies.length - 1; j >= 0; j--) {
+                const enemy = this.enemies[j];
+                
+                if (this.isColliding(
+                    bullet.x, bullet.y, 4, 15,
+                    enemy.x, enemy.y, 40, 40
+                )) {
+                    // 创建爆炸效果
+                    this.createExplosion(enemy.x + 20, enemy.y + 20);
+                    
+                    // 移除子弹和敌机
+                    this.gameArea.removeChild(bullet.element);
+                    this.gameArea.removeChild(enemy.element);
+                    
+                    this.bullets.splice(i, 1);
+                    this.enemies.splice(j, 1);
+                    
+                    // 增加分数
+                    this.score += 10;
+                    this.updateUI();
+                    
+                    break;
                 }
             }
         }
-        return true;
-    }
-
-    highlightWinningPieces() {
-        this.renderBoard();
-    }
-
-    updatePlayerDisplay() {
-        const playerDisplay = document.getElementById('current-player');
-        playerDisplay.textContent = `当前玩家: ${this.currentPlayer === 'black' ? '黑棋' : '白棋'}`;
-    }
-
-    showMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.className = 'game-message';
-        messageElement.textContent = message;
-        messageElement.style.display = 'block';
-        document.body.appendChild(messageElement);
         
-        setTimeout(() => {
-            messageElement.style.display = 'none';
-            document.body.removeChild(messageElement);
-        }, 3000);
+        // 检查玩家与敌机的碰撞
+        for (let i = this.enemies.length - 1; i >= 0; i--) {
+            const enemy = this.enemies[i];
+            
+            if (this.isColliding(
+                this.playerX, 540, 50, 50,
+                enemy.x, enemy.y, 40, 40
+            )) {
+                // 创建爆炸效果
+                this.createExplosion(enemy.x + 20, enemy.y + 20);
+                
+                // 移除敌机
+                this.gameArea.removeChild(enemy.element);
+                this.enemies.splice(i, 1);
+                
+                // 减少生命值
+                this.lives--;
+                this.updateUI();
+                
+                if (this.lives <= 0) {
+                    this.endGame();
+                }
+                
+                break;
+            }
+        }
+    }
+
+    isColliding(x1, y1, w1, h1, x2, y2, w2, h2) {
+        return x1 < x2 + w2 &&
+               x1 + w1 > x2 &&
+               y1 < y2 + h2 &&
+               y1 + h1 > y2;
+    }
+
+    createExplosion(x, y) {
+        const explosion = document.createElement('div');
+        explosion.className = 'explosion';
+        explosion.style.left = (x - 30) + 'px';
+        explosion.style.top = (y - 30) + 'px';
+        
+        this.gameArea.appendChild(explosion);
+        this.explosions.push({
+            element: explosion,
+            life: 30
+        });
+    }
+
+    updateUI() {
+        this.scoreElement.textContent = `得分: ${this.score}`;
+        this.livesElement.textContent = `生命: ${this.lives}`;
+    }
+
+    endGame() {
+        this.gameOver = true;
+        
+        clearInterval(this.gameLoop);
+        clearInterval(this.enemySpawnInterval);
+        clearInterval(this.bulletInterval);
+        
+        this.finalScoreElement.textContent = `最终得分: ${this.score}`;
+        this.gameOverElement.style.display = 'flex';
     }
 
     restart() {
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
-        this.createBoard();
-        this.renderBoard();
-        this.updatePlayerDisplay();
+        // 清理游戏元素
+        this.bullets.forEach(bullet => {
+            if (bullet.element.parentNode) {
+                this.gameArea.removeChild(bullet.element);
+            }
+        });
+        
+        this.enemies.forEach(enemy => {
+            if (enemy.element.parentNode) {
+                this.gameArea.removeChild(enemy.element);
+            }
+        });
+        
+        this.explosions.forEach(explosion => {
+            if (explosion.element.parentNode) {
+                this.gameArea.removeChild(explosion.element);
+            }
+        });
+        
+        this.bullets = [];
+        this.enemies = [];
+        this.explosions = [];
+        
+        // 隐藏游戏结束界面
+        this.gameOverElement.style.display = 'none';
+        
+        // 重新开始游戏
+        this.startGame();
     }
 }
 
 // 初始化游戏
 document.addEventListener('DOMContentLoaded', () => {
-    new Gomoku();
+    new PlaneWarGame();
 });
