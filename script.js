@@ -1,199 +1,296 @@
-class Gomoku {
+class PlaneWarGame {
     constructor() {
-        this.boardSize = 15;
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
+        this.gameArea = document.getElementById('game-area');
+        this.playerPlane = document.getElementById('player-plane');
+        this.scoreElement = document.getElementById('score');
+        this.livesElement = document.getElementById('lives');
+        this.gameOverElement = document.getElementById('game-over');
+        this.finalScoreElement = document.getElementById('final-score');
+        
+        this.score = 0;
+        this.lives = 3;
+        this.gameRunning = false;
+        this.playerX = 50;
+        this.bullets = [];
+        this.enemies = [];
+        this.explosions = [];
+        this.clouds = [];
+        this.keys = {};
+        
+        this.enemySpawnInterval = 2000;
+        this.enemySpeed = 2;
+        this.bulletSpeed = 8;
+        this.playerSpeed = 5;
         
         this.init();
     }
 
     init() {
-        this.createBoard();
-        this.renderBoard();
-        this.attachEventListeners();
-        this.updatePlayerDisplay();
+        this.setupEventListeners();
+        this.startGame();
     }
 
-    createBoard() {
-        this.board = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(null));
-    }
-
-    renderBoard() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.innerHTML = '';
-        
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-                
-                if (this.board[row][col]) {
-                    const piece = document.createElement('div');
-                    piece.className = `piece ${this.board[row][col]}`;
-                    
-                    if (this.winningCells.some(([r, c]) => r === row && c === col)) {
-                        piece.classList.add('winning-piece');
-                    }
-                    
-                    cell.appendChild(piece);
-                    cell.classList.add('disabled');
-                }
-                
-                boardElement.appendChild(cell);
+    setupEventListeners() {
+        document.addEventListener('keydown', (e) => {
+            this.keys[e.key] = true;
+            if (e.key === ' ') {
+                e.preventDefault();
+                this.shootBullet();
             }
-        }
-    }
+        });
 
-    attachEventListeners() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.addEventListener('click', (e) => {
-            if (this.gameOver) return;
-            
-            const cell = e.target.closest('.cell');
-            if (!cell || cell.classList.contains('disabled')) return;
-            
-            const row = parseInt(cell.dataset.row);
-            const col = parseInt(cell.dataset.col);
-            
-            this.placePiece(row, col);
+        document.addEventListener('keyup', (e) => {
+            this.keys[e.key] = false;
         });
 
         document.getElementById('restart-btn').addEventListener('click', () => {
-            this.restart();
+            this.restartGame();
+        });
+
+        document.getElementById('restart-game-btn').addEventListener('click', () => {
+            this.restartGame();
         });
     }
 
-    placePiece(row, col) {
-        if (this.board[row][col] !== null) return;
-        
-        this.board[row][col] = this.currentPlayer;
-        
-        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        const piece = document.createElement('div');
-        piece.className = `piece ${this.currentPlayer}`;
-        cell.appendChild(piece);
-        cell.classList.add('disabled');
-        
-        if (this.checkWin(row, col)) {
-            this.gameOver = true;
-            this.highlightWinningPieces();
-            this.showMessage(`${this.currentPlayer === 'black' ? '黑棋' : '白棋'} 获胜！`);
-            return;
-        }
-        
-        if (this.checkDraw()) {
-            this.gameOver = true;
-            this.showMessage('平局！');
-            return;
-        }
-        
-        this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
-        this.updatePlayerDisplay();
+    startGame() {
+        this.gameRunning = true;
+        this.gameOverElement.style.display = 'none';
+        this.updateDisplay();
+        this.createClouds();
+        this.gameLoop();
+        this.spawnEnemies();
     }
 
-    checkWin(row, col) {
-        const directions = [
-            [0, 1],   // 水平
-            [1, 0],   // 垂直
-            [1, 1],   // 对角线
-            [1, -1]   // 反对角线
-        ];
-        
-        for (const [dx, dy] of directions) {
-            const cells = this.getLineCells(row, col, dx, dy);
-            if (cells.length >= 5) {
-                this.winningCells = cells;
-                return true;
-            }
+    createClouds() {
+        for (let i = 0; i < 3; i++) {
+            this.createCloud();
         }
-        
-        return false;
     }
 
-    getLineCells(row, col, dx, dy) {
-        const player = this.board[row][col];
-        const cells = [[row, col]];
+    createCloud() {
+        const cloud = document.createElement('div');
+        cloud.className = 'cloud';
+        const size = Math.random() * 40 + 30;
+        cloud.style.width = `${size}px`;
+        cloud.style.height = `${size * 0.6}px`;
+        cloud.style.left = `${Math.random() * 100}%`;
+        cloud.style.top = `${Math.random() * 50}%`;
         
-        // 正向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row + i * dx;
-            const newCol = col + i * dy;
+        cloud.style.setProperty('--cloud-size', `${size * 0.7}px`);
+        cloud.style.setProperty('--cloud-left', `${size * 0.3}px`);
+        cloud.style.setProperty('--cloud-top', `${size * 0.2}px`);
+        
+        this.gameArea.appendChild(cloud);
+        this.clouds.push({
+            element: cloud,
+            x: parseFloat(cloud.style.left),
+            y: parseFloat(cloud.style.top),
+            speed: Math.random() * 0.5 + 0.2
+        });
+    }
+
+    gameLoop() {
+        if (!this.gameRunning) return;
+        
+        this.updatePlayer();
+        this.updateBullets();
+        this.updateEnemies();
+        this.updateClouds();
+        this.updateExplosions();
+        this.checkCollisions();
+        
+        requestAnimationFrame(() => this.gameLoop());
+    }
+
+    updatePlayer() {
+        if (this.keys['ArrowLeft'] && this.playerX > 5) {
+            this.playerX -= this.playerSpeed;
+        }
+        if (this.keys['ArrowRight'] && this.playerX < 95) {
+            this.playerX += this.playerSpeed;
+        }
+        
+        this.playerPlane.style.left = `${this.playerX}%`;
+    }
+
+    shootBullet() {
+        if (!this.gameRunning) return;
+        
+        const bullet = document.createElement('div');
+        bullet.className = 'bullet';
+        const playerRect = this.playerPlane.getBoundingClientRect();
+        const gameAreaRect = this.gameArea.getBoundingClientRect();
+        
+        bullet.style.left = `${playerRect.left - gameAreaRect.left + playerRect.width / 2 - 2}px`;
+        bullet.style.top = `${playerRect.top - gameAreaRect.top - 15}px`;
+        
+        this.gameArea.appendChild(bullet);
+        this.bullets.push({
+            element: bullet,
+            x: parseFloat(bullet.style.left),
+            y: parseFloat(bullet.style.top)
+        });
+    }
+
+    updateBullets() {
+        this.bullets = this.bullets.filter(bullet => {
+            bullet.y -= this.bulletSpeed;
+            bullet.element.style.top = `${bullet.y}px`;
             
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
+            if (bullet.y < -20) {
+                bullet.element.remove();
+                return false;
             }
-        }
+            return true;
+        });
+    }
+
+    spawnEnemies() {
+        if (!this.gameRunning) return;
         
-        // 反向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row - i * dx;
-            const newCol = col - i * dy;
+        const enemy = document.createElement('div');
+        enemy.className = 'enemy-plane';
+        const x = Math.random() * 90 + 5;
+        
+        enemy.style.left = `${x}%`;
+        enemy.style.top = '-50px';
+        
+        this.gameArea.appendChild(enemy);
+        this.enemies.push({
+            element: enemy,
+            x: x,
+            y: -50
+        });
+        
+        setTimeout(() => this.spawnEnemies(), this.enemySpawnInterval);
+    }
+
+    updateEnemies() {
+        this.enemies = this.enemies.filter(enemy => {
+            enemy.y += this.enemySpeed;
+            enemy.element.style.top = `${enemy.y}px`;
             
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
+            if (enemy.y > window.innerHeight) {
+                enemy.element.remove();
+                return false;
             }
-        }
+            return true;
+        });
+    }
+
+    updateClouds() {
+        this.clouds.forEach(cloud => {
+            cloud.y += cloud.speed;
+            cloud.element.style.top = `${cloud.y}%`;
+            
+            if (cloud.y > 100) {
+                cloud.y = -10;
+                cloud.x = Math.random() * 100;
+                cloud.element.style.left = `${cloud.x}%`;
+            }
+        });
+    }
+
+    createExplosion(x, y) {
+        const explosion = document.createElement('div');
+        explosion.className = 'explosion';
+        explosion.style.left = `${x}px`;
+        explosion.style.top = `${y}px`;
         
-        return cells;
+        this.gameArea.appendChild(explosion);
+        this.explosions.push({
+            element: explosion,
+            timer: 30
+        });
     }
 
-    isValidPosition(row, col) {
-        return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
+    updateExplosions() {
+        this.explosions = this.explosions.filter(explosion => {
+            explosion.timer--;
+            if (explosion.timer <= 0) {
+                explosion.element.remove();
+                return false;
+            }
+            return true;
+        });
     }
 
-    checkDraw() {
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                if (this.board[row][col] === null) {
-                    return false;
+    checkCollisions() {
+        this.bullets.forEach((bullet, bulletIndex) => {
+            this.enemies.forEach((enemy, enemyIndex) => {
+                if (this.isColliding(bullet, enemy, 30, 40)) {
+                    this.createExplosion(enemy.x, enemy.y);
+                    bullet.element.remove();
+                    enemy.element.remove();
+                    this.bullets.splice(bulletIndex, 1);
+                    this.enemies.splice(enemyIndex, 1);
+                    this.score += 10;
+                    this.updateDisplay();
+                }
+            });
+        });
+
+        this.enemies.forEach((enemy, enemyIndex) => {
+            const playerRect = this.playerPlane.getBoundingClientRect();
+            const gameAreaRect = this.gameArea.getBoundingClientRect();
+            const playerX = playerRect.left - gameAreaRect.left;
+            const playerY = playerRect.top - gameAreaRect.top;
+            
+            if (this.isColliding(
+                {x: enemy.x, y: enemy.y},
+                {x: playerX, y: playerY},
+                40, 50
+            )) {
+                this.createExplosion(enemy.x, enemy.y);
+                enemy.element.remove();
+                this.enemies.splice(enemyIndex, 1);
+                this.lives--;
+                this.updateDisplay();
+                
+                if (this.lives <= 0) {
+                    this.gameOver();
                 }
             }
-        }
-        return true;
+        });
     }
 
-    highlightWinningPieces() {
-        this.renderBoard();
+    isColliding(obj1, obj2, threshold1, threshold2) {
+        const distance = Math.sqrt(
+            Math.pow(obj1.x - obj2.x, 2) + 
+            Math.pow(obj1.y - obj2.y, 2)
+        );
+        return distance < (threshold1 + threshold2) / 2;
     }
 
-    updatePlayerDisplay() {
-        const playerDisplay = document.getElementById('current-player');
-        playerDisplay.textContent = `当前玩家: ${this.currentPlayer === 'black' ? '黑棋' : '白棋'}`;
+    updateDisplay() {
+        this.scoreElement.textContent = `得分: ${this.score}`;
+        this.livesElement.textContent = `生命: ${this.lives}`;
     }
 
-    showMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.className = 'game-message';
-        messageElement.textContent = message;
-        messageElement.style.display = 'block';
-        document.body.appendChild(messageElement);
+    gameOver() {
+        this.gameRunning = false;
+        this.finalScoreElement.textContent = `最终得分: ${this.score}`;
+        this.gameOverElement.style.display = 'flex';
+    }
+
+    restartGame() {
+        this.score = 0;
+        this.lives = 3;
+        this.playerX = 50;
+        this.bullets.forEach(bullet => bullet.element.remove());
+        this.enemies.forEach(enemy => enemy.element.remove());
+        this.explosions.forEach(explosion => explosion.element.remove());
+        this.bullets = [];
+        this.enemies = [];
+        this.explosions = [];
+        this.keys = {};
         
-        setTimeout(() => {
-            messageElement.style.display = 'none';
-            document.body.removeChild(messageElement);
-        }, 3000);
-    }
-
-    restart() {
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
-        this.createBoard();
-        this.renderBoard();
-        this.updatePlayerDisplay();
+        this.updateDisplay();
+        this.startGame();
     }
 }
 
 // 初始化游戏
 document.addEventListener('DOMContentLoaded', () => {
-    new Gomoku();
+    new PlaneWarGame();
 });
