@@ -1,174 +1,141 @@
-class Gomoku {
+class SnakeGame {
     constructor() {
-        this.boardSize = 15;
-        this.board = [];
-        this.currentPlayer = 'black';
+        this.canvas = document.getElementById('game-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.scoreElement = document.getElementById('score');
+        
+        this.gridSize = 20;
+        this.tileCount = this.canvas.width / this.gridSize;
+        
+        this.snake = [
+            {x: 10, y: 10}
+        ];
+        this.food = {};
+        this.dx = 0;
+        this.dy = 0;
+        this.score = 0;
         this.gameOver = false;
-        this.winningCells = [];
         
         this.init();
     }
-
+    
     init() {
-        this.createBoard();
-        this.renderBoard();
+        this.generateFood();
         this.attachEventListeners();
-        this.updatePlayerDisplay();
+        this.gameLoop();
     }
-
-    createBoard() {
-        this.board = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(null));
-    }
-
-    renderBoard() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.innerHTML = '';
-        
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-                
-                if (this.board[row][col]) {
-                    const piece = document.createElement('div');
-                    piece.className = `piece ${this.board[row][col]}`;
-                    
-                    if (this.winningCells.some(([r, c]) => r === row && c === col)) {
-                        piece.classList.add('winning-piece');
-                    }
-                    
-                    cell.appendChild(piece);
-                    cell.classList.add('disabled');
-                }
-                
-                boardElement.appendChild(cell);
-            }
-        }
-    }
-
+    
     attachEventListeners() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.addEventListener('click', (e) => {
+        document.addEventListener('keydown', (e) => {
             if (this.gameOver) return;
             
-            const cell = e.target.closest('.cell');
-            if (!cell || cell.classList.contains('disabled')) return;
-            
-            const row = parseInt(cell.dataset.row);
-            const col = parseInt(cell.dataset.col);
-            
-            this.placePiece(row, col);
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (this.dy !== 1) {
+                        this.dx = 0;
+                        this.dy = -1;
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (this.dy !== -1) {
+                        this.dx = 0;
+                        this.dy = 1;
+                    }
+                    break;
+                case 'ArrowLeft':
+                    if (this.dx !== 1) {
+                        this.dx = -1;
+                        this.dy = 0;
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (this.dx !== -1) {
+                        this.dx = 1;
+                        this.dy = 0;
+                    }
+                    break;
+            }
         });
-
+        
         document.getElementById('restart-btn').addEventListener('click', () => {
             this.restart();
         });
     }
-
-    placePiece(row, col) {
-        if (this.board[row][col] !== null) return;
+    
+    generateFood() {
+        do {
+            this.food = {
+                x: Math.floor(Math.random() * this.tileCount),
+                y: Math.floor(Math.random() * this.tileCount)
+            };
+        } while (this.snake.some(segment => segment.x === this.food.x && segment.y === this.food.y));
+    }
+    
+    update() {
+        if (this.gameOver) return;
         
-        this.board[row][col] = this.currentPlayer;
+        const head = {x: this.snake[0].x + this.dx, y: this.snake[0].y + this.dy};
         
-        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        const piece = document.createElement('div');
-        piece.className = `piece ${this.currentPlayer}`;
-        cell.appendChild(piece);
-        cell.classList.add('disabled');
-        
-        if (this.checkWin(row, col)) {
-            this.gameOver = true;
-            this.highlightWinningPieces();
-            this.showMessage(`${this.currentPlayer === 'black' ? '黑棋' : '白棋'} 获胜！`);
+        // 检查墙壁碰撞
+        if (head.x < 0 || head.x >= this.tileCount || head.y < 0 || head.y >= this.tileCount) {
+            this.endGame();
             return;
         }
         
-        if (this.checkDraw()) {
-            this.gameOver = true;
-            this.showMessage('平局！');
+        // 检查自身碰撞
+        if (this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+            this.endGame();
             return;
         }
         
-        this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
-        this.updatePlayerDisplay();
-    }
-
-    checkWin(row, col) {
-        const directions = [
-            [0, 1],   // 水平
-            [1, 0],   // 垂直
-            [1, 1],   // 对角线
-            [1, -1]   // 反对角线
-        ];
+        this.snake.unshift(head);
         
-        for (const [dx, dy] of directions) {
-            const cells = this.getLineCells(row, col, dx, dy);
-            if (cells.length >= 5) {
-                this.winningCells = cells;
-                return true;
-            }
+        // 检查是否吃到食物
+        if (head.x === this.food.x && head.y === this.food.y) {
+            this.score += 10;
+            this.updateScore();
+            this.generateFood();
+        } else {
+            this.snake.pop();
         }
-        
-        return false;
     }
-
-    getLineCells(row, col, dx, dy) {
-        const player = this.board[row][col];
-        const cells = [[row, col]];
+    
+    draw() {
+        // 清空画布
+        this.ctx.fillStyle = '#111';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // 正向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row + i * dx;
-            const newCol = col + i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
+        // 绘制蛇
+        this.snake.forEach((segment, index) => {
+            this.ctx.fillStyle = index === 0 ? '#4CAF50' : '#8BC34A';
+            this.ctx.fillRect(segment.x * this.gridSize, segment.y * this.gridSize, this.gridSize - 2, this.gridSize - 2);
+        });
+        
+        // 绘制食物
+        this.ctx.fillStyle = '#FF5722';
+        this.ctx.fillRect(this.food.x * this.gridSize, this.food.y * this.gridSize, this.gridSize - 2, this.gridSize - 2);
+    }
+    
+    gameLoop() {
+        this.update();
+        this.draw();
+        
+        setTimeout(() => {
+            if (!this.gameOver) {
+                this.gameLoop();
             }
-        }
-        
-        // 反向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row - i * dx;
-            const newCol = col - i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
-            }
-        }
-        
-        return cells;
+        }, 100);
     }
-
-    isValidPosition(row, col) {
-        return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
+    
+    updateScore() {
+        this.scoreElement.textContent = `得分: ${this.score}`;
     }
-
-    checkDraw() {
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                if (this.board[row][col] === null) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    
+    endGame() {
+        this.gameOver = true;
+        this.showMessage(`游戏结束！得分: ${this.score}`);
     }
-
-    highlightWinningPieces() {
-        this.renderBoard();
-    }
-
-    updatePlayerDisplay() {
-        const playerDisplay = document.getElementById('current-player');
-        playerDisplay.textContent = `当前玩家: ${this.currentPlayer === 'black' ? '黑棋' : '白棋'}`;
-    }
-
+    
     showMessage(message) {
         const messageElement = document.createElement('div');
         messageElement.className = 'game-message';
@@ -181,19 +148,20 @@ class Gomoku {
             document.body.removeChild(messageElement);
         }, 3000);
     }
-
+    
     restart() {
-        this.board = [];
-        this.currentPlayer = 'black';
+        this.snake = [{x: 10, y: 10}];
+        this.dx = 0;
+        this.dy = 0;
+        this.score = 0;
         this.gameOver = false;
-        this.winningCells = [];
-        this.createBoard();
-        this.renderBoard();
-        this.updatePlayerDisplay();
+        this.updateScore();
+        this.generateFood();
+        this.gameLoop();
     }
 }
 
 // 初始化游戏
 document.addEventListener('DOMContentLoaded', () => {
-    new Gomoku();
+    new SnakeGame();
 });

@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>贪吃蛇游戏</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>五子棋游戏</h1>
+        <h1>贪吃蛇游戏</h1>
         <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
+            <div id="score">得分: 0</div>
             <button id="restart-btn">重新开始</button>
         </div>
-        <div class="game-board" id="game-board"></div>
+        <canvas id="game-canvas" width="400" height="400"></canvas>
+        <div class="controls">
+            <p>使用方向键控制蛇的移动</p>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
