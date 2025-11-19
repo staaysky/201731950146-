@@ -6,128 +6,262 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
-.container {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    text-align: center;
-}
-
-h1 {
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 2.5em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.game-info {
+.game-container {
+    width: 100%;
+    max-width: 1200px;
+    height: 100vh;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.game-header {
+    text-align: center;
     margin-bottom: 20px;
-    padding: 0 20px;
 }
 
-#current-player {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #444;
+.game-header h1 {
+    color: #fff;
+    font-size: 3em;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+    background: linear-gradient(45deg, #ff6b6b, #ffd700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-#restart-btn {
+.game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#restart-btn, #pause-btn {
     background: linear-gradient(45deg, #ff6b6b, #ee5a24);
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 25px;
     border-radius: 25px;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 1.1em;
     font-weight: bold;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
 }
 
-#restart-btn:hover {
+#restart-btn:hover, #pause-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
 }
 
-.game-board {
-    display: grid;
-    grid-template-columns: repeat(15, 35px);
-    grid-template-rows: repeat(15, 35px);
-    gap: 1px;
-    background: #8b4513;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    margin: 0 auto;
-    width: fit-content;
-}
-
-.cell {
-    background: #deb887;
-    border: 1px solid #8b4513;
-    cursor: pointer;
+.game-arena {
+    flex: 1;
     display: flex;
-    justify-content: center;
     align-items: center;
-    transition: background-color 0.3s ease;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.player-info {
+    width: 200px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    padding: 15px;
+    color: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.player-name {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.health-bar-container, .energy-bar-container {
+    width: 100%;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    border: 2px solid #333;
+}
+
+.health-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff4444, #ff6666);
+    transition: width 0.3s ease;
+    width: 100%;
+}
+
+.energy-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4444ff, #6666ff);
+    transition: width 0.3s ease;
+    width: 100%;
+}
+
+.game-stage {
+    flex: 1;
+    height: 500px;
+    background: linear-gradient(180deg, #87CEEB 0%, #98D8C8 50%, #8FBC8F 100%);
+    border-radius: 15px;
     position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 3px solid #333;
 }
 
-.cell:hover {
-    background: #f4e4c1;
-}
-
-.cell.disabled {
-    cursor: not-allowed;
-}
-
-.piece {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+.character {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 120px;
+    bottom: 100px;
+    transition: left 0.1s ease;
 }
 
-.black {
-    background: radial-gradient(circle at 30% 30%, #444, #000);
+.player1 {
+    left: 100px;
 }
 
-.white {
-    background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+.player2 {
+    right: 100px;
+    transform: scaleX(-1);
 }
 
-.winning-piece {
-    animation: pulse 1s infinite;
+.character-sprite {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-@keyframes pulse {
+.player1 .character-sprite {
+    background: linear-gradient(45deg, #4ecdc4, #44a08d);
+}
+
+.player2 .character-sprite {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+}
+
+.character.attacking .character-sprite {
+    animation: attack 0.3s ease;
+}
+
+.character.defending .character-sprite {
+    animation: defend 0.5s ease;
+    opacity: 0.7;
+}
+
+.character.special-attack .character-sprite {
+    animation: specialAttack 0.8s ease;
+}
+
+@keyframes attack {
+    0% { transform: scaleX(1); }
+    50% { transform: scaleX(1.2) translateX(10px); }
+    100% { transform: scaleX(1); }
+}
+
+@keyframes defend {
+    0%, 100% { transform: scaleX(1); }
+    50% { transform: scaleX(0.8); }
+}
+
+@keyframes specialAttack {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.3) rotate(180deg); }
+    100% { transform: scale(1) rotate(360deg); }
+}
+
+.effects-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.hit-effect {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(255, 255, 0, 0.8), transparent);
+    border-radius: 50%;
+    animation: hitEffect 0.5s ease forwards;
+}
+
+@keyframes hitEffect {
     0% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.1);
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        transform: scale(0);
+        opacity: 1;
     }
     100% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        transform: scale(2);
+        opacity: 0;
     }
+}
+
+.special-effect {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(255, 0, 255, 0.8), transparent);
+    border-radius: 50%;
+    animation: specialEffect 1s ease forwards;
+}
+
+@keyframes specialEffect {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5) rotate(180deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(3) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.game-footer {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.controls-info {
+    display: flex;
+    justify-content: space-around;
+    color: white;
+}
+
+.player-controls h3 {
+    color: #ffd700;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.player-controls p {
+    margin: 5px 0;
+    font-size: 0.9em;
 }
 
 .game-message {
@@ -137,13 +271,16 @@ h1 {
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.9);
     color: white;
-    padding: 30px 50px;
+    padding: 40px 60px;
     border-radius: 15px;
-    font-size: 1.5em;
+    font-size: 2em;
     font-weight: bold;
     z-index: 1000;
     display: none;
     animation: fadeIn 0.5s ease;
+    text-align: center;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
 }
 
 @keyframes fadeIn {
@@ -155,4 +292,15 @@ h1 {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
     }
+}
+
+.game-stage::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(180deg, transparent, rgba(139, 69, 19, 0.3));
+    pointer-events: none;
 }
