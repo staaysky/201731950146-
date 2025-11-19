@@ -3,18 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>火柴人羽毛球</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>火柴人羽毛球</h1>
+            <div class="score-board">
+                <div class="score">
+                    <span>玩家</span>
+                    <span id="player-score">0</span>
+                </div>
+                <div class="score">
+                    <span>电脑</span>
+                    <span id="ai-score">0</span>
+                </div>
+            </div>
         </div>
-        <div class="game-board" id="game-board"></div>
+        
+        <div class="game-area" id="game-area">
+            <div class="court">
+                <div class="net"></div>
+                <div class="player" id="player">
+                    <div class="stickman">
+                        <div class="head"></div>
+                        <div class="body"></div>
+                        <div class="arm left-arm"></div>
+                        <div class="arm right-arm"></div>
+                        <div class="leg left-leg"></div>
+                        <div class="leg right-leg"></div>
+                    </div>
+                </div>
+                <div class="ai-player" id="ai-player">
+                    <div class="stickman">
+                        <div class="head"></div>
+                        <div class="body"></div>
+                        <div class="arm left-arm"></div>
+                        <div class="arm right-arm"></div>
+                        <div class="leg left-leg"></div>
+                        <div class="leg right-leg"></div>
+                    </div>
+                </div>
+                <div class="shuttlecock" id="shuttlecock"></div>
+            </div>
+        </div>
+        
+        <div class="game-controls">
+            <div class="instructions">
+                <p>操作说明：W/↑ 向上移动，S/↓ 向下移动，空格键击球</p>
+            </div>
+            <div class="buttons">
+                <button id="start-btn">开始游戏</button>
+                <button id="pause-btn">暂停</button>
+                <button id="restart-btn">重新开始</button>
+            </div>
+        </div>
+        
+        <div class="game-message" id="game-message"></div>
     </div>
+    
     <script src="script.js"></script>
 </body>
 </html>
