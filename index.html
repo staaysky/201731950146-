@@ -3,17 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>围棋游戏</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>五子棋游戏</h1>
+        <h1>围棋游戏</h1>
         <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
+            <div id="current-player">当前玩家: 黑棋(您)</div>
+            <div id="game-status">游戏进行中</div>
             <button id="restart-btn">重新开始</button>
+            <button id="pass-btn">虚手</button>
+            <button id="end-game-btn">结束游戏</button>
         </div>
         <div class="game-board" id="game-board"></div>
+        <div class="score-board" id="score-board" style="display: none;">
+            <h2>游戏结果</h2>
+            <div id="black-score">黑棋目数: 0</div>
+            <div id="white-score">白棋目数: 0</div>
+            <div id="winner"></div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
