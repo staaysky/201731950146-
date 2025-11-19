@@ -3,18 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>火柴人羽毛球游戏</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
-        </div>
-        <div class="game-board" id="game-board"></div>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>火柴人羽毛球</h1>
+            <div class="score-board">
+                <div class="player-score">
+                    <span>玩家</span>
+                    <span id="player-score">0</span>
+                </div>
+                <div class="ai-score">
+                    <span>电脑</span>
+                    <span id="ai-score">0</span>
+                </div>
+            </div>
+            <div class="game-controls">
+                <button id="start-btn">开始游戏</button>
+                <button id="restart-btn">重新开始</button>
+            </div>
+        </header>
+        
+        <main class="game-area">
+            <canvas id="game-canvas" width="800" height="400"></canvas>
+            <div class="instructions">
+                <p>使用 W/S 键上下移动，空格键击球</p>
+            </div>
+        </main>
+        
+        <div class="game-message" id="game-message"></div>
     </div>
+    
     <script src="script.js"></script>
 </body>
 </html>
