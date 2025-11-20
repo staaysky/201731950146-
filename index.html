@@ -3,18 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>音乐博客 - 动感音乐世界</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+    <!-- 导航栏 -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-music"></i>
+                <span>音乐博客</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#home" class="nav-link">首页</a>
+                <a href="#blog" class="nav-link">博客</a>
+                <a href="#gallery" class="nav-link">图库</a>
+                <a href="#about" class="nav-link">关于</a>
+            </nav>
         </div>
-        <div class="game-board" id="game-board"></div>
-    </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main>
+        <!-- 动图轮播区域 -->
+        <section id="home" class="hero-section">
+            <div class="carousel-container">
+                <div class="carousel-slide active">
+                    <img src="https://picsum.photos/seed/music1/1200/600.jpg" alt="音乐场景1">
+                    <div class="slide-content">
+                        <h2>感受音乐的魅力</h2>
+                        <p>让旋律触动你的心灵</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://picsum.photos/seed/music2/1200/600.jpg" alt="音乐场景2">
+                    <div class="slide-content">
+                        <h2>探索音乐的无限可能</h2>
+                        <p>每一个音符都是一个故事</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://picsum.photos/seed/music3/1200/600.jpg" alt="音乐场景3">
+                    <div class="slide-content">
+                        <h2>音乐改变生活</h2>
+                        <p>用节奏点燃激情</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://picsum.photos/seed/music4/1200/600.jpg" alt="音乐场景4">
+                    <div class="slide-content">
+                        <h2>音乐连接世界</h2>
+                        <p>跨越语言和文化的界限</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://picsum.photos/seed/music5/1200/600.jpg" alt="音乐场景5">
+                    <div class="slide-content">
+                        <h2>音乐的治愈力量</h2>
+                        <p>让心灵得到宁静与安慰</p>
+                    </div>
+                </div>
+                
+                <!-- 轮播控制按钮 -->
+                <button class="carousel-btn prev-btn" onclick="changeSlide(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-btn next-btn" onclick="changeSlide(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <!-- 轮播指示器 -->
+                <div class="carousel-indicators">
+                    <span class="indicator active" onclick="goToSlide(0)"></span>
+                    <span class="indicator" onclick="goToSlide(1)"></span>
+                    <span class="indicator" onclick="goToSlide(2)"></span>
+                    <span class="indicator" onclick="goToSlide(3)"></span>
+                    <span class="indicator" onclick="goToSlide(4)"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 音乐播放器区域 -->
+        <section class="music-player-section">
+            <div class="music-player">
+                <div class="player-header">
+                    <h3>音乐播放器</h3>
+                </div>
+                <div class="album-cover">
+                    <img src="https://picsum.photos/seed/album1/300/300.jpg" alt="专辑封面" id="album-cover">
+                    <div class="music-visualizer">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                </div>
+                <div class="track-info">
+                    <h4 id="track-title">梦幻音乐之旅</h4>
+                    <p id="track-artist">未知艺术家</p>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="current-time">0:00</span>
+                        <span id="total-time">3:45</span>
+                    </div>
+                </div>
+                <div class="player-controls">
+                    <button class="control-btn" id="shuffle-btn">
+                        <i class="fas fa-random"></i>
+                    </button>
+                    <button class="control-btn" id="prev-btn">
+                        <i class="fas fa-step-backward"></i>
+                    </button>
+                    <button class="control-btn play-pause-btn" id="play-pause-btn">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="control-btn" id="next-btn">
+                        <i class="fas fa-step-forward"></i>
+                    </button>
+                    <button class="control-btn" id="repeat-btn">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+                <div class="volume-container">
+                    <i class="fas fa-volume-up"></i>
+                    <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="70">
+                </div>
+                <div class="playlist">
+                    <h5>播放列表</h5>
+                    <div class="playlist-items" id="playlist">
+                        <div class="playlist-item active" data-track="0">
+                            <span class="track-number">1</span>
+                            <div class="track-details">
+                                <span class="track-name">梦幻音乐之旅</span>
+                                <span class="track-artist">未知艺术家</span>
+                            </div>
+                            <span class="track-duration">3:45</span>
+                        </div>
+                        <div class="playlist-item" data-track="1">
+                            <span class="track-number">2</span>
+                            <div class="track-details">
+                                <span class="track-name">星空下的旋律</span>
+                                <span class="track-artist">夜空乐团</span>
+                            </div>
+                            <span class="track-duration">4:12</span>
+                        </div>
+                        <div class="playlist-item" data-track="2">
+                            <span class="track-number">3</span>
+                            <div class="track-details">
+                                <span class="track-name">雨后彩虹</span>
+                                <span class="track-artist">自然之声</span>
+                            </div>
+                            <span class="track-duration">3:28</span>
+                        </div>
+                        <div class="playlist-item" data-track="3">
+                            <span class="track-number">4</span>
+                            <div class="track-details">
+                                <span class="track-name">城市节奏</span>
+                                <span class="track-artist">都市节拍</span>
+                            </div>
+                            <span class="track-duration">4:05</span>
+                        </div>
+                        <div class="playlist-item" data-track="4">
+                            <span class="track-number">5</span>
+                            <div class="track-details">
+                                <span class="track-name">心灵之旅</span>
+                                <span class="track-artist">冥想音乐团</span>
+                            </div>
+                            <span class="track-duration">5:30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 博客文章区域 -->
+        <section id="blog" class="blog-section">
+            <div class="container">
+                <h2 class="section-title">音乐博客</h2>
+                <div class="blog-grid">
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <img src="https://picsum.photos/seed/blog1/400/250.jpg" alt="博客图片1">
+                        </div>
+                        <div class="blog-content">
+                            <h3>音乐如何改变我们的生活</h3>
+                            <p>音乐是一种强大的情感表达工具，它能够深刻影响我们的情绪和生活质量...</p>
+                            <a href="#" class="read-more">阅读更多</a>
+                        </div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <img src="https://picsum.photos/seed/blog2/400/250.jpg" alt="博客图片2">
+                        </div>
+                        <div class="blog-content">
+                            <h3>探索不同音乐类型的魅力</h3>
+                            <p>从古典到摇滚，从爵士到电子，每种音乐类型都有其独特的魅力和表达方式...</p>
+                            <a href="#" class="read-more">阅读更多</a>
+                        </div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <img src="https://picsum.photos/seed/blog3/400/250.jpg" alt="博客图片3">
+                        </div>
+                        <div class="blog-content">
+                            <h3>音乐创作的艺术</h3>
+                            <p>创作音乐是一种艺术表达，需要灵感、技巧和情感的完美结合...</p>
+                            <a href="#" class="read-more">阅读更多</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- 图库区域 -->
+        <section id="gallery" class="gallery-section">
+            <div class="container">
+                <h2 class="section-title">音乐图库</h2>
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/seed/gallery1/300/300.jpg" alt="音乐图片1">
+                        <div class="gallery-overlay">
+                            <i class="fas fa-music"></i>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/seed/gallery2/300/300.jpg" alt="音乐图片2">
+                        <div class="gallery-overlay">
+                            <i class="fas fa-headphones"></i>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/seed/gallery3/300/300.jpg" alt="音乐图片3">
+                        <div class="gallery-overlay">
+                            <i class="fas fa-guitar"></i>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/seed/gallery4/300/300.jpg" alt="音乐图片4">
+                        <div class="gallery-overlay">
+                            <i class="fas fa-microphone"></i>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/seed/gallery5/300/300.jpg" alt="音乐图片5">
+                        <div class="gallery-overlay">
+                            <i class="fas fa-compact-disc"></i>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/seed/gallery6/300/300.jpg" alt="音乐图片6">
+                        <div class="gallery-overlay">
+                            <i class="fas fa-drum"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于区域 -->
+        <section id="about" class="about-section">
+            <div class="container">
+                <h2 class="section-title">关于我们</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <h3>欢迎来到音乐博客</h3>
+                        <p>我们是一个热爱音乐的平台，致力于分享音乐的美好和力量。在这里，你可以发现新的音乐，了解音乐背后的故事，与其他音乐爱好者交流心得。</p>
+                        <p>无论你是音乐创作者、演奏者，还是单纯的音乐爱好者，这里都有属于你的空间。让我们一起探索音乐的无限可能，感受旋律带来的情感共鸣。</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-facebook"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <img src="https://picsum.photos/seed/about/500/400.jpg" alt="关于我们">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>音乐博客</h4>
+                    <p>分享音乐的美好，传递旋律的力量</p>
+                </div>
+                <div class="footer-section">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#blog">博客</a></li>
+                        <li><a href="#gallery">图库</a></li>
+                        <li><a href="#about">关于</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>联系我们</h4>
+                    <p><i class="fas fa-envelope"></i> contact@musicblog.com</p>
+                    <p><i class="fas fa-phone"></i> +86 123 4567 8900</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 音乐博客. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
