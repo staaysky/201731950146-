@@ -3,18 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>音乐播放器</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+        <h1>音乐播放器</h1>
+        <div class="music-player">
+            <div class="player-header">
+                <div class="album-cover">
+                    <img id="album-image" src="https://picsum.photos/seed/music1/300/300.jpg" alt="专辑封面">
+                    <div class="play-overlay">
+                        <button id="main-play-btn" class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="track-info">
+                    <h2 id="track-title">未知歌曲</h2>
+                    <p id="track-artist">未知艺术家</p>
+                </div>
+            </div>
+            
+            <div class="player-controls">
+                <button id="prev-btn" class="control-btn">
+                    <i class="fas fa-backward"></i>
+                </button>
+                <button id="play-pause-btn" class="control-btn play-pause">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button id="next-btn" class="control-btn">
+                    <i class="fas fa-forward"></i>
+                </button>
+            </div>
+            
+            <div class="progress-container">
+                <span id="current-time">0:00</span>
+                <div class="progress-bar">
+                    <div id="progress" class="progress"></div>
+                </div>
+                <span id="total-time">0:00</span>
+            </div>
+            
+            <div class="volume-container">
+                <i class="fas fa-volume-up"></i>
+                <input type="range" id="volume-slider" min="0" max="100" value="70">
+            </div>
+            
+            <div class="playlist">
+                <h3>播放列表</h3>
+                <ul id="playlist-items">
+                    <li class="playlist-item active" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+                        <span class="item-number">1</span>
+                        <div class="item-info">
+                            <span class="item-title">示例歌曲 1</span>
+                            <span class="item-artist">示例艺术家</span>
+                        </div>
+                        <span class="item-duration">3:45</span>
+                    </li>
+                    <li class="playlist-item" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">
+                        <span class="item-number">2</span>
+                        <div class="item-info">
+                            <span class="item-title">示例歌曲 2</span>
+                            <span class="item-artist">示例艺术家</span>
+                        </div>
+                        <span class="item-duration">4:12</span>
+                    </li>
+                    <li class="playlist-item" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3">
+                        <span class="item-number">3</span>
+                        <div class="item-info">
+                            <span class="item-title">示例歌曲 3</span>
+                            <span class="item-artist">示例艺术家</span>
+                        </div>
+                        <span class="item-duration">5:30</span>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="game-board" id="game-board"></div>
     </div>
+    
+    <audio id="audio-player"></audio>
     <script src="script.js"></script>
 </body>
 </html>

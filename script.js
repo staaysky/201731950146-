@@ -1,199 +1,195 @@
-class Gomoku {
+class MusicPlayer {
     constructor() {
-        this.boardSize = 15;
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
+        this.audioPlayer = document.getElementById('audio-player');
+        this.playPauseBtn = document.getElementById('play-pause-btn');
+        this.mainPlayBtn = document.getElementById('main-play-btn');
+        this.prevBtn = document.getElementById('prev-btn');
+        this.nextBtn = document.getElementById('next-btn');
+        this.progressBar = document.getElementById('progress');
+        this.progressBarContainer = document.querySelector('.progress-bar');
+        this.currentTimeEl = document.getElementById('current-time');
+        this.totalTimeEl = document.getElementById('total-time');
+        this.volumeSlider = document.getElementById('volume-slider');
+        this.playlistItems = document.querySelectorAll('.playlist-item');
+        this.trackTitle = document.getElementById('track-title');
+        this.trackArtist = document.getElementById('track-artist');
+        this.albumImage = document.getElementById('album-image');
+        this.albumCover = document.querySelector('.album-cover');
+        
+        this.currentTrackIndex = 0;
+        this.isPlaying = false;
+        this.tracks = [
+            {
+                title: '示例歌曲 1',
+                artist: '示例艺术家',
+                src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+                duration: '3:45',
+                image: 'https://picsum.photos/seed/music1/300/300.jpg'
+            },
+            {
+                title: '示例歌曲 2',
+                artist: '示例艺术家',
+                src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+                duration: '4:12',
+                image: 'https://picsum.photos/seed/music2/300/300.jpg'
+            },
+            {
+                title: '示例歌曲 3',
+                artist: '示例艺术家',
+                src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+                duration: '5:30',
+                image: 'https://picsum.photos/seed/music3/300/300.jpg'
+            }
+        ];
         
         this.init();
     }
 
     init() {
-        this.createBoard();
-        this.renderBoard();
+        this.loadTrack(this.currentTrackIndex);
         this.attachEventListeners();
-        this.updatePlayerDisplay();
+        this.setVolume(70);
     }
 
-    createBoard() {
-        this.board = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(null));
-    }
-
-    renderBoard() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.innerHTML = '';
+    loadTrack(index) {
+        if (index < 0 || index >= this.tracks.length) return;
         
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-                
-                if (this.board[row][col]) {
-                    const piece = document.createElement('div');
-                    piece.className = `piece ${this.board[row][col]}`;
-                    
-                    if (this.winningCells.some(([r, c]) => r === row && c === col)) {
-                        piece.classList.add('winning-piece');
-                    }
-                    
-                    cell.appendChild(piece);
-                    cell.classList.add('disabled');
-                }
-                
-                boardElement.appendChild(cell);
+        this.currentTrackIndex = index;
+        const track = this.tracks[index];
+        
+        this.audioPlayer.src = track.src;
+        this.trackTitle.textContent = track.title;
+        this.trackArtist.textContent = track.artist;
+        this.albumImage.src = track.image;
+        
+        // 更新播放列表高亮
+        this.playlistItems.forEach((item, i) => {
+            if (i === index) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
             }
+        });
+        
+        // 如果正在播放，自动播放新加载的歌曲
+        if (this.isPlaying) {
+            this.audioPlayer.play();
         }
     }
 
     attachEventListeners() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.addEventListener('click', (e) => {
-            if (this.gameOver) return;
-            
-            const cell = e.target.closest('.cell');
-            if (!cell || cell.classList.contains('disabled')) return;
-            
-            const row = parseInt(cell.dataset.row);
-            const col = parseInt(cell.dataset.col);
-            
-            this.placePiece(row, col);
+        // 播放/暂停按钮
+        this.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
+        this.mainPlayBtn.addEventListener('click', () => this.togglePlayPause());
+        
+        // 上一首/下一首按钮
+        this.prevBtn.addEventListener('click', () => this.playPreviousTrack());
+        this.nextBtn.addEventListener('click', () => this.playNextTrack());
+        
+        // 进度条
+        this.progressBarContainer.addEventListener('click', (e) => this.seekTo(e));
+        
+        // 音量控制
+        this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
+        
+        // 播放列表项点击
+        this.playlistItems.forEach((item, index) => {
+            item.addEventListener('click', () => {
+                this.loadTrack(index);
+                this.play();
+            });
         });
-
-        document.getElementById('restart-btn').addEventListener('click', () => {
-            this.restart();
-        });
+        
+        // 音频事件
+        this.audioPlayer.addEventListener('timeupdate', () => this.updateProgress());
+        this.audioPlayer.addEventListener('loadedmetadata', () => this.updateDuration());
+        this.audioPlayer.addEventListener('ended', () => this.playNextTrack());
     }
 
-    placePiece(row, col) {
-        if (this.board[row][col] !== null) return;
-        
-        this.board[row][col] = this.currentPlayer;
-        
-        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        const piece = document.createElement('div');
-        piece.className = `piece ${this.currentPlayer}`;
-        cell.appendChild(piece);
-        cell.classList.add('disabled');
-        
-        if (this.checkWin(row, col)) {
-            this.gameOver = true;
-            this.highlightWinningPieces();
-            this.showMessage(`${this.currentPlayer === 'black' ? '黑棋' : '白棋'} 获胜！`);
-            return;
+    togglePlayPause() {
+        if (this.isPlaying) {
+            this.pause();
+        } else {
+            this.play();
         }
+    }
+
+    play() {
+        this.audioPlayer.play();
+        this.isPlaying = true;
+        this.updatePlayPauseButton();
+        this.albumCover.classList.add('playing');
+    }
+
+    pause() {
+        this.audioPlayer.pause();
+        this.isPlaying = false;
+        this.updatePlayPauseButton();
+        this.albumCover.classList.remove('playing');
+    }
+
+    updatePlayPauseButton() {
+        const icon = this.playPauseBtn.querySelector('i');
+        const mainIcon = this.mainPlayBtn.querySelector('i');
         
-        if (this.checkDraw()) {
-            this.gameOver = true;
-            this.showMessage('平局！');
-            return;
+        if (this.isPlaying) {
+            icon.className = 'fas fa-pause';
+            mainIcon.className = 'fas fa-pause';
+        } else {
+            icon.className = 'fas fa-play';
+            mainIcon.className = 'fas fa-play';
         }
-        
-        this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
-        this.updatePlayerDisplay();
     }
 
-    checkWin(row, col) {
-        const directions = [
-            [0, 1],   // 水平
-            [1, 0],   // 垂直
-            [1, 1],   // 对角线
-            [1, -1]   // 反对角线
-        ];
-        
-        for (const [dx, dy] of directions) {
-            const cells = this.getLineCells(row, col, dx, dy);
-            if (cells.length >= 5) {
-                this.winningCells = cells;
-                return true;
-            }
+    playPreviousTrack() {
+        let prevIndex = this.currentTrackIndex - 1;
+        if (prevIndex < 0) {
+            prevIndex = this.tracks.length - 1;
         }
-        
-        return false;
+        this.loadTrack(prevIndex);
+        this.play();
     }
 
-    getLineCells(row, col, dx, dy) {
-        const player = this.board[row][col];
-        const cells = [[row, col]];
-        
-        // 正向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row + i * dx;
-            const newCol = col + i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
-            }
+    playNextTrack() {
+        let nextIndex = this.currentTrackIndex + 1;
+        if (nextIndex >= this.tracks.length) {
+            nextIndex = 0;
         }
+        this.loadTrack(nextIndex);
+        this.play();
+    }
+
+    seekTo(event) {
+        const rect = this.progressBarContainer.getBoundingClientRect();
+        const percent = (event.clientX - rect.left) / rect.width;
+        this.audioPlayer.currentTime = percent * this.audioPlayer.duration;
+    }
+
+    updateProgress() {
+        const percent = (this.audioPlayer.currentTime / this.audioPlayer.duration) * 100;
+        this.progressBar.style.width = `${percent}%`;
+        this.currentTimeEl.textContent = this.formatTime(this.audioPlayer.currentTime);
+    }
+
+    updateDuration() {
+        this.totalTimeEl.textContent = this.formatTime(this.audioPlayer.duration);
+    }
+
+    setVolume(value) {
+        this.audioPlayer.volume = value / 100;
+        this.volumeSlider.value = value;
+    }
+
+    formatTime(seconds) {
+        if (isNaN(seconds)) return '0:00';
         
-        // 反向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row - i * dx;
-            const newCol = col - i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
-            }
-        }
-        
-        return cells;
-    }
-
-    isValidPosition(row, col) {
-        return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
-    }
-
-    checkDraw() {
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                if (this.board[row][col] === null) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    highlightWinningPieces() {
-        this.renderBoard();
-    }
-
-    updatePlayerDisplay() {
-        const playerDisplay = document.getElementById('current-player');
-        playerDisplay.textContent = `当前玩家: ${this.currentPlayer === 'black' ? '黑棋' : '白棋'}`;
-    }
-
-    showMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.className = 'game-message';
-        messageElement.textContent = message;
-        messageElement.style.display = 'block';
-        document.body.appendChild(messageElement);
-        
-        setTimeout(() => {
-            messageElement.style.display = 'none';
-            document.body.removeChild(messageElement);
-        }, 3000);
-    }
-
-    restart() {
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
-        this.createBoard();
-        this.renderBoard();
-        this.updatePlayerDisplay();
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     }
 }
 
-// 初始化游戏
+// 初始化音乐播放器
 document.addEventListener('DOMContentLoaded', () => {
-    new Gomoku();
+    new MusicPlayer();
 });
