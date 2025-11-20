@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态背景日历</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 1s ease-in-out;
+        }
+
+        .calendar-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .month-year {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .nav-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-button:hover {
+            background: #45a049;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            padding: 8px;
+        }
+
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .day:hover {
+            background: #e8f5e9;
+            transform: scale(1.1);
+        }
+
+        .day.other-month {
+            color: #ccc;
+        }
+
+        .day.today {
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+
+        .day.selected {
+            background: #2196F3;
+            color: white;
+        }
+
+        .current-time {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .background-info {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button class="nav-button" id="prevMonth">‹</button>
+            <div class="month-year" id="monthYear"></div>
+            <button class="nav-button" id="nextMonth">›</button>
+        </div>
+        
+        <div class="weekdays">
+            <div class="weekday">日</div>
+            <div class="weekday">一</div>
+            <div class="weekday">二</div>
+            <div class="weekday">三</div>
+            <div class="weekday">四</div>
+            <div class="weekday">五</div>
+            <div class="weekday">六</div>
+        </div>
+        
+        <div class="days" id="days"></div>
+        
+        <div class="current-time" id="currentTime"></div>
+    </div>
+    
+    <div class="background-info" id="backgroundInfo">背景图片每分钟更新</div>
+
+    <script>
+        class DynamicCalendar {
+            constructor() {
+                this.currentDate = new Date();
+                this.selectedDate = null;
+                this.backgroundIndex = 0;
+                this.backgroundUrls = this.generateBackgroundUrls();
+                
+                this.init();
+            }
+
+            generateBackgroundUrls() {
+                // 使用 Picsum Photos API 生成不同的背景图片
+                const urls = [];
+                for (let i = 0; i < 60; i++) {
+                    urls.push(`https://picsum.photos/seed/calendar${i}/1920/1080.jpg`);
+                }
+                return urls;
+            }
+
+            init() {
+                this.renderCalendar();
+                this.updateCurrentTime();
+                this.updateBackground();
+                this.attachEventListeners();
+                
+                // 每秒更新时间
+                setInterval(() => this.updateCurrentTime(), 1000);
+                
+                // 每分钟更新背景
+                setInterval(() => this.updateBackground(), 60000);
+            }
+
+            renderCalendar() {
+                const year = this.currentDate.getFullYear();
+                const month = this.currentDate.getMonth();
+                
+                // 更新月份年份显示
+                const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', 
+                                  '七月', '八月', '九月', '十月', '十一月', '十二月'];
+                document.getElementById('monthYear').textContent = `${year}年 ${monthNames[month]}`;
+                
+                // 获取月份的第一天和最后一天
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const prevLastDay = new Date(year, month, 0);
+                
+                const firstDayOfWeek = firstDay.getDay();
+                const lastDayDate = lastDay.getDate();
+                const prevLastDayDate = prevLastDay.getDate();
+                
+                const daysContainer = document.getElementById('days');
+                daysContainer.innerHTML = '';
+                
+                // 添加上个月的日期
+                for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+                    const dayElement = this.createDayElement(prevLastDayDate - i, true, false);
+                    daysContainer.appendChild(dayElement);
+                }
+                
+                // 添加当前月的日期
+                const today = new Date();
+                for (let i = 1; i <= lastDayDate; i++) {
+                    const isToday = year === today.getFullYear() && 
+                                   month === today.getMonth() && 
+                                   i === today.getDate();
+                    const dayElement = this.createDayElement(i, false, isToday);
+                    daysContainer.appendChild(dayElement);
+                }
+                
+                // 添加下个月的日期
+                const remainingDays = 42 - (firstDayOfWeek + lastDayDate);
+                for (let i = 1; i <= remainingDays; i++) {
+                    const dayElement = this.createDayElement(i, true, false);
+                    daysContainer.appendChild(dayElement);
+                }
+            }
+
+            createDayElement(day, isOtherMonth, isToday) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day';
+                dayElement.textContent = day;
+                
+                if (isOtherMonth) {
+                    dayElement.classList.add('other-month');
+                }
+                
+                if (isToday) {
+                    dayElement.classList.add('today');
+                }
+                
+                dayElement.addEventListener('click', () => {
+                    // 移除之前选中的日期
+                    document.querySelectorAll('.day.selected').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    // 添加选中状态
+                    if (!isOtherMonth) {
+                        dayElement.classList.add('selected');
+                        this.selectedDate = new Date(
+                            this.currentDate.getFullYear(),
+                            this.currentDate.getMonth(),
+                            day
+                        );
+                    }
+                });
+                
+                return dayElement;
+            }
+
+            updateCurrentTime() {
+                const now = new Date();
+                const timeString = now.toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                document.getElementById('currentTime').textContent = timeString;
+            }
+
+            updateBackground() {
+                this.backgroundIndex = (this.backgroundIndex + 1) % this.backgroundUrls.length;
+                const imageUrl = this.backgroundUrls[this.backgroundIndex];
+                
+                // 预加载图片
+                const img = new Image();
+                img.onload = () => {
+                    document.body.style.backgroundImage = `url(${imageUrl})`;
+                };
+                img.src = imageUrl;
+                
+                // 更新背景信息
+                const nextUpdate = new Date();
+                nextUpdate.setMinutes(nextUpdate.getMinutes() + 1);
+                const nextUpdateTime = nextUpdate.toLocaleTimeString('zh-CN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                document.getElementById('backgroundInfo').textContent = 
+                    `背景已更新 | 下次更新: ${nextUpdateTime}`;
+            }
+
+            attachEventListeners() {
+                document.getElementById('prevMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                    this.renderCalendar();
+                });
+                
+                document.getElementById('nextMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                    this.renderCalendar();
+                });
+                
+                // 键盘导航
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        document.getElementById('prevMonth').click();
+                    } else if (e.key === 'ArrowRight') {
+                        document.getElementById('nextMonth').click();
+                    }
+                });
+            }
+        }
+
+        // 页面加载完成后初始化日历
+        document.addEventListener('DOMContentLoaded', () => {
+            new DynamicCalendar();
+        });
+    </script>
+</body>
+</html>
