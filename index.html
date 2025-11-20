@@ -3,17 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>飞机大战</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="480" height="700"></canvas>
+        <div id="gameInfo">
+            <div id="score">得分: 0</div>
+            <div id="lives">生命: 3</div>
         </div>
-        <div class="game-board" id="game-board"></div>
+        <div id="gameOver" class="hidden">
+            <h2>游戏结束</h2>
+            <p>最终得分: <span id="finalScore">0</span></p>
+            <button id="restartBtn">重新开始</button>
+        </div>
+        <div id="startScreen">
+            <h1>飞机大战</h1>
+            <p>使用方向键移动，空格键射击</p>
+            <button id="startBtn">开始游戏</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

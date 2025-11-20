@@ -1,158 +1,102 @@
-* {
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
+    background: linear-gradient(to bottom, #1a2980, #26d0ce);
+    font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 100vh;
 }
 
-.container {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+#gameContainer {
+    position: relative;
+    margin: 20px auto;
     text-align: center;
 }
 
-h1 {
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 2.5em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+#gameCanvas {
+    background-color: #000;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    display: block;
 }
 
-.game-info {
+#gameInfo {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 0 20px;
-}
-
-#current-player {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #444;
-}
-
-#restart-btn {
-    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    width: 480px;
+    margin-top: 10px;
     color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 1em;
+    font-size: 18px;
     font-weight: bold;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
 }
 
-#restart-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
+#score, #lives {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 5px 15px;
+    border-radius: 20px;
 }
 
-.game-board {
-    display: grid;
-    grid-template-columns: repeat(15, 35px);
-    grid-template-rows: repeat(15, 35px);
-    gap: 1px;
-    background: #8b4513;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    margin: 0 auto;
-    width: fit-content;
-}
-
-.cell {
-    background: #deb887;
-    border: 1px solid #8b4513;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.3s ease;
-    position: relative;
-}
-
-.cell:hover {
-    background: #f4e4c1;
-}
-
-.cell.disabled {
-    cursor: not-allowed;
-}
-
-.piece {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+#gameOver, #startScreen {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-}
-
-.black {
-    background: radial-gradient(circle at 30% 30%, #444, #000);
-}
-
-.white {
-    background: radial-gradient(circle at 30% 30%, #fff, #ddd);
-}
-
-.winning-piece {
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.1);
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
-}
-
-.game-message {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.85);
     color: white;
-    padding: 30px 50px;
-    border-radius: 15px;
-    font-size: 1.5em;
-    font-weight: bold;
-    z-index: 1000;
-    display: none;
-    animation: fadeIn 0.5s ease;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    width: 300px;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
+#startScreen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#startScreen h1 {
+    margin: 0 0 15px 0;
+    color: #4CAF50;
+    font-size: 32px;
+}
+
+#startScreen p {
+    margin: 10px 0;
+    color: #ccc;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.hidden {
+    display: none;
+}
+
+#restartBtn {
+    background-color: #2196F3;
+}
+
+#restartBtn:hover {
+    background-color: #0b7dda;
+}
+
+h2 {
+    margin-top: 0;
+    color: #ff5722;
 }
