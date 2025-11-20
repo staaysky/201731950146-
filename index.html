@@ -3,17 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>森林冰火人</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>森林冰火人</h1>
+            <div class="game-info">
+                <div class="level-info">关卡: <span id="level">1</span></div>
+                <div class="gems-info">
+                    <div class="gem-count fire-gem">火宝石: <span id="fire-gems">0</span></div>
+                    <div class="gem-count water-gem">冰宝石: <span id="water-gems">0</span></div>
+                </div>
+                <button id="restart-btn">重新开始</button>
+            </div>
         </div>
-        <div class="game-board" id="game-board"></div>
+        <div class="game-controls">
+            <div class="control-info">
+                <div class="fire-controls">
+                    <h3>火人控制</h3>
+                    <p>方向键移动</p>
+                </div>
+                <div class="water-controls">
+                    <h3>冰人控制</h3>
+                    <p>WASD移动</p>
+                </div>
+            </div>
+        </div>
+        <div class="game-area">
+            <canvas id="game-canvas" width="800" height="600"></canvas>
+            <div id="game-message" class="game-message"></div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
