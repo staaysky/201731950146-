@@ -1,199 +1,285 @@
-class Gomoku {
+class MusicPlayer {
     constructor() {
-        this.boardSize = 15;
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
+        this.songs = [
+            {
+                title: "夏日微风",
+                artist: "轻音乐团",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+                cover: "https://picsum.photos/seed/summer/300/300.jpg",
+                duration: "4:35"
+            },
+            {
+                title: "星空漫步",
+                artist: "梦想乐队",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+                cover: "https://picsum.photos/seed/stars/300/300.jpg",
+                duration: "3:42"
+            },
+            {
+                title: "雨后彩虹",
+                artist: "自然之声",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+                cover: "https://picsum.photos/seed/rainbow/300/300.jpg",
+                duration: "5:18"
+            },
+            {
+                title: "晨曦初现",
+                artist: "黎明组合",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+                cover: "https://picsum.photos/seed/dawn/300/300.jpg",
+                duration: "4:02"
+            },
+            {
+                title: "海浪轻语",
+                artist: "海洋音乐",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+                cover: "https://picsum.photos/seed/ocean/300/300.jpg",
+                duration: "3:56"
+            }
+        ];
+        
+        this.currentSongIndex = 0;
+        this.isPlaying = false;
+        this.isRepeat = false;
+        this.isShuffle = false;
+        this.audio = new Audio();
         
         this.init();
     }
 
     init() {
-        this.createBoard();
-        this.renderBoard();
+        this.loadSong(this.currentSongIndex);
+        this.renderPlaylist();
         this.attachEventListeners();
         this.updatePlayerDisplay();
     }
 
-    createBoard() {
-        this.board = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(null));
+    loadSong(index) {
+        const song = this.songs[index];
+        this.audio.src = song.src;
+        
+        document.getElementById('song-title').textContent = song.title;
+        document.getElementById('artist-name').textContent = song.artist;
+        document.getElementById('album-cover').src = song.cover;
+        
+        this.updateActiveSong();
     }
 
-    renderBoard() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.innerHTML = '';
+    renderPlaylist() {
+        const playlistElement = document.getElementById('playlist-songs');
+        playlistElement.innerHTML = '';
         
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-                
-                if (this.board[row][col]) {
-                    const piece = document.createElement('div');
-                    piece.className = `piece ${this.board[row][col]}`;
-                    
-                    if (this.winningCells.some(([r, c]) => r === row && c === col)) {
-                        piece.classList.add('winning-piece');
-                    }
-                    
-                    cell.appendChild(piece);
-                    cell.classList.add('disabled');
-                }
-                
-                boardElement.appendChild(cell);
+        this.songs.forEach((song, index) => {
+            const li = document.createElement('li');
+            li.dataset.index = index;
+            
+            if (index === this.currentSongIndex) {
+                li.classList.add('active');
             }
-        }
+            
+            li.innerHTML = `
+                <span>${song.title} - ${song.artist}</span>
+                <span class="song-duration">${song.duration}</span>
+            `;
+            
+            li.addEventListener('click', () => {
+                this.currentSongIndex = index;
+                this.loadSong(index);
+                this.play();
+            });
+            
+            playlistElement.appendChild(li);
+        });
+    }
+
+    updateActiveSong() {
+        const playlistItems = document.querySelectorAll('#playlist-songs li');
+        playlistItems.forEach((item, index) => {
+            if (index === this.currentSongIndex) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
     }
 
     attachEventListeners() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.addEventListener('click', (e) => {
-            if (this.gameOver) return;
-            
-            const cell = e.target.closest('.cell');
-            if (!cell || cell.classList.contains('disabled')) return;
-            
-            const row = parseInt(cell.dataset.row);
-            const col = parseInt(cell.dataset.col);
-            
-            this.placePiece(row, col);
+        // 播放/暂停按钮
+        document.getElementById('play-pause-btn').addEventListener('click', () => {
+            this.togglePlayPause();
         });
 
-        document.getElementById('restart-btn').addEventListener('click', () => {
-            this.restart();
+        // 上一首按钮
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            this.playPrevious();
         });
+
+        // 下一首按钮
+        document.getElementById('next-btn').addEventListener('click', () => {
+            this.playNext();
+        });
+
+        // 随机播放按钮
+        document.getElementById('shuffle-btn').addEventListener('click', () => {
+            this.toggleShuffle();
+        });
+
+        // 循环播放按钮
+        document.getElementById('repeat-btn').addEventListener('click', () => {
+            this.toggleRepeat();
+        });
+
+        // 音量控制
+        document.getElementById('volume-slider').addEventListener('input', (e) => {
+            this.audio.volume = e.target.value / 100;
+        });
+
+        // 进度条控制
+        document.querySelector('.progress-bar').addEventListener('click', (e) => {
+            const progressBar = e.currentTarget;
+            const clickX = e.offsetX;
+            const width = progressBar.offsetWidth;
+            const percentage = clickX / width;
+            this.audio.currentTime = percentage * this.audio.duration;
+        });
+
+        // 音频事件监听
+        this.audio.addEventListener('timeupdate', () => {
+            this.updateProgress();
+        });
+
+        this.audio.addEventListener('loadedmetadata', () => {
+            this.updateTimeDisplay();
+        });
+
+        this.audio.addEventListener('ended', () => {
+            this.handleSongEnd();
+        });
+
+        // 设置初始音量
+        this.audio.volume = 0.7;
     }
 
-    placePiece(row, col) {
-        if (this.board[row][col] !== null) return;
-        
-        this.board[row][col] = this.currentPlayer;
-        
-        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        const piece = document.createElement('div');
-        piece.className = `piece ${this.currentPlayer}`;
-        cell.appendChild(piece);
-        cell.classList.add('disabled');
-        
-        if (this.checkWin(row, col)) {
-            this.gameOver = true;
-            this.highlightWinningPieces();
-            this.showMessage(`${this.currentPlayer === 'black' ? '黑棋' : '白棋'} 获胜！`);
-            return;
+    togglePlayPause() {
+        if (this.isPlaying) {
+            this.pause();
+        } else {
+            this.play();
         }
-        
-        if (this.checkDraw()) {
-            this.gameOver = true;
-            this.showMessage('平局！');
-            return;
-        }
-        
-        this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
-        this.updatePlayerDisplay();
     }
 
-    checkWin(row, col) {
-        const directions = [
-            [0, 1],   // 水平
-            [1, 0],   // 垂直
-            [1, 1],   // 对角线
-            [1, -1]   // 反对角线
-        ];
-        
-        for (const [dx, dy] of directions) {
-            const cells = this.getLineCells(row, col, dx, dy);
-            if (cells.length >= 5) {
-                this.winningCells = cells;
-                return true;
-            }
-        }
-        
-        return false;
+    play() {
+        this.audio.play();
+        this.isPlaying = true;
+        document.getElementById('play-pause-btn').textContent = '⏸️';
     }
 
-    getLineCells(row, col, dx, dy) {
-        const player = this.board[row][col];
-        const cells = [[row, col]];
-        
-        // 正向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row + i * dx;
-            const newCol = col + i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
-            }
-        }
-        
-        // 反向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row - i * dx;
-            const newCol = col - i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
-            }
-        }
-        
-        return cells;
+    pause() {
+        this.audio.pause();
+        this.isPlaying = false;
+        document.getElementById('play-pause-btn').textContent = '▶️';
     }
 
-    isValidPosition(row, col) {
-        return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
-    }
-
-    checkDraw() {
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                if (this.board[row][col] === null) {
-                    return false;
-                }
-            }
+    playPrevious() {
+        if (this.isShuffle) {
+            this.currentSongIndex = Math.floor(Math.random() * this.songs.length);
+        } else {
+            this.currentSongIndex = (this.currentSongIndex - 1 + this.songs.length) % this.songs.length;
         }
-        return true;
+        
+        this.loadSong(this.currentSongIndex);
+        if (this.isPlaying) {
+            this.play();
+        }
     }
 
-    highlightWinningPieces() {
-        this.renderBoard();
+    playNext() {
+        if (this.isShuffle) {
+            this.currentSongIndex = Math.floor(Math.random() * this.songs.length);
+        } else {
+            this.currentSongIndex = (this.currentSongIndex + 1) % this.songs.length;
+        }
+        
+        this.loadSong(this.currentSongIndex);
+        if (this.isPlaying) {
+            this.play();
+        }
+    }
+
+    toggleShuffle() {
+        this.isShuffle = !this.isShuffle;
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        
+        if (this.isShuffle) {
+            shuffleBtn.style.color = '#667eea';
+            shuffleBtn.style.background = 'rgba(102, 126, 234, 0.1)';
+        } else {
+            shuffleBtn.style.color = '';
+            shuffleBtn.style.background = '';
+        }
+    }
+
+    toggleRepeat() {
+        this.isRepeat = !this.isRepeat;
+        const repeatBtn = document.getElementById('repeat-btn');
+        
+        if (this.isRepeat) {
+            repeatBtn.style.color = '#667eea';
+            repeatBtn.style.background = 'rgba(102, 126, 234, 0.1)';
+        } else {
+            repeatBtn.style.color = '';
+            repeatBtn.style.background = '';
+        }
+    }
+
+    updateProgress() {
+        const progress = (this.audio.currentTime / this.audio.duration) * 100;
+        document.getElementById('progress').style.width = `${progress}%`;
+        
+        const currentMinutes = Math.floor(this.audio.currentTime / 60);
+        const currentSeconds = Math.floor(this.audio.currentTime % 60);
+        document.getElementById('current-time').textContent = 
+            `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`;
+    }
+
+    updateTimeDisplay() {
+        const totalMinutes = Math.floor(this.audio.duration / 60);
+        const totalSeconds = Math.floor(this.audio.duration % 60);
+        document.getElementById('total-time').textContent = 
+            `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`;
+    }
+
+    handleSongEnd() {
+        if (this.isRepeat) {
+            this.audio.currentTime = 0;
+            this.play();
+        } else {
+            this.playNext();
+        }
     }
 
     updatePlayerDisplay() {
-        const playerDisplay = document.getElementById('current-player');
-        playerDisplay.textContent = `当前玩家: ${this.currentPlayer === 'black' ? '黑棋' : '白棋'}`;
-    }
-
-    showMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.className = 'game-message';
-        messageElement.textContent = message;
-        messageElement.style.display = 'block';
-        document.body.appendChild(messageElement);
-        
-        setTimeout(() => {
-            messageElement.style.display = 'none';
-            document.body.removeChild(messageElement);
-        }, 3000);
-    }
-
-    restart() {
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
-        this.createBoard();
-        this.renderBoard();
-        this.updatePlayerDisplay();
+        // 初始化显示
+        document.getElementById('current-time').textContent = '0:00';
+        document.getElementById('total-time').textContent = '0:00';
     }
 }
 
-// 初始化游戏
+// 平滑滚动
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// 初始化音乐播放器
 document.addEventListener('DOMContentLoaded', () => {
-    new Gomoku();
+    new MusicPlayer();
 });
