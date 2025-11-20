@@ -6,153 +6,161 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    overflow: hidden;
 }
 
-.container {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
+#background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 1s ease-in-out;
+}
+
+.calendar-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+    backdrop-filter: blur(10px);
+    animation: slideIn 0.5s ease-out;
 }
 
-h1 {
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 2.5em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.game-info {
+.calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding: 0 20px;
 }
 
-#current-player {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #444;
+.calendar-header h2 {
+    color: #333;
+    font-size: 1.8em;
+    font-weight: 600;
 }
 
-#restart-btn {
-    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+.calendar-header button {
+    background: linear-gradient(45deg, #667eea, #764ba2);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 1.2em;
     font-weight: bold;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-#restart-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
+.calendar-header button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
-.game-board {
+.weekdays {
     display: grid;
-    grid-template-columns: repeat(15, 35px);
-    grid-template-rows: repeat(15, 35px);
-    gap: 1px;
-    background: #8b4513;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    margin: 0 auto;
-    width: fit-content;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
 }
 
-.cell {
-    background: #deb887;
-    border: 1px solid #8b4513;
-    cursor: pointer;
+.weekdays div {
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    padding: 10px 0;
+    font-size: 0.9em;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day {
+    aspect-ratio: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.3s ease;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #333;
     position: relative;
 }
 
-.cell:hover {
-    background: #f4e4c1;
+.day:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: scale(1.05);
 }
 
-.cell.disabled {
-    cursor: not-allowed;
-}
-
-.piece {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.black {
-    background: radial-gradient(circle at 30% 30%, #444, #000);
-}
-
-.white {
-    background: radial-gradient(circle at 30% 30%, #fff, #ddd);
-}
-
-.winning-piece {
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.1);
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
-}
-
-.game-message {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.9);
+.day.today {
+    background: linear-gradient(45deg, #667eea, #764ba2);
     color: white;
-    padding: 30px 50px;
-    border-radius: 15px;
-    font-size: 1.5em;
     font-weight: bold;
-    z-index: 1000;
-    display: none;
-    animation: fadeIn 0.5s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
+.day.other-month {
+    color: #aaa;
+}
+
+.day.selected {
+    background: rgba(102, 126, 234, 0.2);
+    border: 2px solid #667eea;
+}
+
+.current-time {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #555;
+    font-weight: 500;
+}
+
+@media (max-width: 600px) {
+    .calendar-container {
+        width: 95%;
+        padding: 20px;
     }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+    
+    .calendar-header h2 {
+        font-size: 1.5em;
+    }
+    
+    .calendar-header button {
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
+    }
+    
+    .day {
+        font-size: 0.9em;
     }
 }
