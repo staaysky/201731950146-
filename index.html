@@ -3,17 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>森林冰火人</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>森林冰火人</h1>
+            <div class="game-info">
+                <div class="level-info">关卡: <span id="current-level">1</span></div>
+                <div class="gems-info">
+                    <div class="gem-counter ice-gems">
+                        <span class="gem-icon">💎</span>
+                        <span id="ice-gem-count">0</span>/<span id="ice-gem-total">0</span>
+                    </div>
+                    <div class="gem-counter fire-gems">
+                        <span class="gem-icon">🔥</span>
+                        <span id="fire-gem-count">0</span>/<span id="fire-gem-total">0</span>
+                    </div>
+                </div>
+                <button id="restart-btn" class="restart-btn">重新开始</button>
+            </div>
         </div>
-        <div class="game-board" id="game-board"></div>
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        <div class="controls-info">
+            <div class="player-controls">
+                <div class="fire-controls">
+                    <span class="player-label">🔥 火人:</span>
+                    <span>← → ↑</span>
+                </div>
+                <div class="ice-controls">
+                    <span class="player-label">💎 冰人:</span>
+                    <span>A D W</span>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

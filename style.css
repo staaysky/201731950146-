@@ -6,128 +6,142 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
-.container {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+.game-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     text-align: center;
+    max-width: 900px;
+}
+
+.game-header {
+    margin-bottom: 20px;
 }
 
 h1 {
-    color: #333;
-    margin-bottom: 20px;
+    color: #2c3e50;
+    margin-bottom: 15px;
     font-size: 2.5em;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(45deg, #3498db, #e74c3c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .game-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     padding: 0 20px;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
-#current-player {
+.level-info {
     font-size: 1.2em;
     font-weight: bold;
-    color: #444;
+    color: #2c3e50;
 }
 
-#restart-btn {
-    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+.gems-info {
+    display: flex;
+    gap: 20px;
+}
+
+.gem-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.ice-gems {
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    color: white;
+}
+
+.fire-gems {
+    background: linear-gradient(135deg, #fab1a0, #e17055);
+    color: white;
+}
+
+.gem-icon {
+    font-size: 1.2em;
+}
+
+.restart-btn {
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 25px;
     cursor: pointer;
     font-size: 1em;
     font-weight: bold;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
 }
 
-#restart-btn:hover {
+.restart-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
 }
 
-.game-board {
-    display: grid;
-    grid-template-columns: repeat(15, 35px);
-    grid-template-rows: repeat(15, 35px);
-    gap: 1px;
-    background: #8b4513;
-    padding: 10px;
-    border-radius: 10px;
+#game-canvas {
+    border: 3px solid #34495e;
+    border-radius: 15px;
+    background: #2c3e50;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: block;
     margin: 0 auto;
-    width: fit-content;
 }
 
-.cell {
-    background: #deb887;
-    border: 1px solid #8b4513;
-    cursor: pointer;
+.controls-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(52, 73, 94, 0.1);
+    border-radius: 10px;
+}
+
+.player-controls {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
-    transition: background-color 0.3s ease;
-    position: relative;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-.cell:hover {
-    background: #f4e4c1;
+.fire-controls, .ice-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
 }
 
-.cell.disabled {
-    cursor: not-allowed;
+.player-label {
+    font-size: 1.1em;
 }
 
-.piece {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.fire-controls {
+    color: #e74c3c;
 }
 
-.black {
-    background: radial-gradient(circle at 30% 30%, #444, #000);
-}
-
-.white {
-    background: radial-gradient(circle at 30% 30%, #fff, #ddd);
-}
-
-.winning-piece {
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.1);
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
+.ice-controls {
+    color: #3498db;
 }
 
 .game-message {
@@ -154,5 +168,26 @@ h1 {
     to {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@media (max-width: 768px) {
+    .game-container {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    #game-canvas {
+        width: 100%;
+        height: auto;
+        max-width: 600px;
+    }
+    
+    .game-info {
+        justify-content: center;
     }
 }
