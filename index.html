@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>台球游戏</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+    <div class="game-container">
+        <h1>台球游戏</h1>
+        <div class="score-board">
+            <div class="score">得分: <span id="score">0</span></div>
+            <div class="balls-remaining">剩余球数: <span id="balls-remaining">15</span></div>
         </div>
-        <div class="game-board" id="game-board"></div>
+        <canvas id="gameCanvas" width="800" height="500"></canvas>
+        <div class="controls">
+            <button id="startBtn">开始游戏</button>
+            <button id="resetBtn">重置游戏</button>
+        </div>
+        <div class="instructions">
+            <p>游戏说明：点击并拖拽鼠标来瞄准，松开鼠标击球</p>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
