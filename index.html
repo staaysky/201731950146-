@@ -3,18 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>音乐博客 - 动感生活</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">音乐博客</div>
+            <ul class="nav-menu">
+                <li><a href="#home">首页</a></li>
+                <li><a href="#blog">博客</a></li>
+                <li><a href="#music">音乐</a></li>
+                <li><a href="#about">关于</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero-section">
+            <div class="carousel-container">
+                <div class="carousel" id="image-carousel">
+                    <div class="carousel-slide active">
+                        <img src="https://picsum.photos/seed/music1/1200/600.jpg" alt="音乐场景1">
+                        <div class="slide-caption">感受音乐的魅力</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://picsum.photos/seed/music2/1200/600.jpg" alt="音乐场景2">
+                        <div class="slide-caption">旋律触动心灵</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://picsum.photos/seed/music3/1200/600.jpg" alt="音乐场景3">
+                        <div class="slide-caption">节奏点燃激情</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://picsum.photos/seed/music4/1200/600.jpg" alt="音乐场景4">
+                        <div class="slide-caption">音符编织梦想</div>
+                    </div>
+                </div>
+                <button class="carousel-btn prev" id="prev-btn">❮</button>
+                <button class="carousel-btn next" id="next-btn">❯</button>
+                <div class="carousel-indicators" id="carousel-indicators"></div>
+            </div>
+        </section>
+
+        <section id="music" class="music-player-section">
+            <div class="container">
+                <h2 class="section-title">音乐播放器</h2>
+                <div class="music-player">
+                    <div class="player-cover">
+                        <img src="https://picsum.photos/seed/album1/300/300.jpg" alt="专辑封面" id="album-cover">
+                        <div class="vinyl-record" id="vinyl"></div>
+                    </div>
+                    <div class="player-info">
+                        <h3 class="song-title" id="song-title">梦想的旋律</h3>
+                        <p class="artist-name" id="artist-name">未知艺术家</p>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar">
+                                <div class="progress" id="progress"></div>
+                            </div>
+                            <div class="time-display">
+                                <span id="current-time">0:00</span>
+                                <span id="total-time">3:45</span>
+                            </div>
+                        </div>
+                        <div class="player-controls">
+                            <button class="control-btn" id="shuffle-btn">🔀</button>
+                            <button class="control-btn" id="prev-song-btn">⏮️</button>
+                            <button class="control-btn play-pause" id="play-pause-btn">▶️</button>
+                            <button class="control-btn" id="next-song-btn">⏭️</button>
+                            <button class="control-btn" id="repeat-btn">🔁</button>
+                        </div>
+                        <div class="volume-control">
+                            <span>🔊</span>
+                            <input type="range" id="volume-slider" min="0" max="100" value="70">
+                        </div>
+                    </div>
+                </div>
+                <div class="playlist">
+                    <h3 class="playlist-title">播放列表</h3>
+                    <ul class="song-list" id="song-list">
+                        <li class="song-item active" data-song="0">
+                            <span class="song-number">1</span>
+                            <div class="song-info">
+                                <div class="song-name">梦想的旋律</div>
+                                <div class="song-artist">未知艺术家</div>
+                            </div>
+                            <span class="song-duration">3:45</span>
+                        </li>
+                        <li class="song-item" data-song="1">
+                            <span class="song-number">2</span>
+                            <div class="song-info">
+                                <div class="song-name">星空下的约定</div>
+                                <div class="song-artist">星光乐队</div>
+                            </div>
+                            <span class="song-duration">4:12</span>
+                        </li>
+                        <li class="song-item" data-song="2">
+                            <span class="song-number">3</span>
+                            <div class="song-info">
+                                <div class="song-name">雨后彩虹</div>
+                                <div class="song-artist">自然之声</div>
+                            </div>
+                            <span class="song-duration">3:28</span>
+                        </li>
+                        <li class="song-item" data-song="3">
+                            <span class="song-number">4</span>
+                            <div class="song-info">
+                                <div class="song-name">城市节拍</div>
+                                <div class="song-artist">都市节奏</div>
+                            </div>
+                            <span class="song-duration">3:56</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="blog" class="blog-section">
+            <div class="container">
+                <h2 class="section-title">最新博客</h2>
+                <div class="blog-grid">
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <img src="https://picsum.photos/seed/blog1/400/250.jpg" alt="博客图片1">
+                        </div>
+                        <div class="blog-content">
+                            <h3>音乐的力量</h3>
+                            <p>探索音乐如何影响我们的情绪和生活，从古典到现代，音乐一直是人类文化的重要组成部分...</p>
+                            <a href="#" class="read-more">阅读更多</a>
+                        </div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <img src="https://picsum.photos/seed/blog2/400/250.jpg" alt="博客图片2">
+                        </div>
+                        <div class="blog-content">
+                            <h3>创作背后的故事</h3>
+                            <p>每一位音乐家都有自己独特的故事，了解他们的创作过程和灵感来源，让我们更深入地理解音乐...</p>
+                            <a href="#" class="read-more">阅读更多</a>
+                        </div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <img src="https://picsum.photos/seed/blog3/400/250.jpg" alt="博客图片3">
+                        </div>
+                        <div class="blog-content">
+                            <h3>音乐与记忆</h3>
+                            <p>为什么某些歌曲能够唤起我们深藏的记忆？科学研究揭示了音乐与大脑记忆系统之间的奇妙联系...</p>
+                            <a href="#" class="read-more">阅读更多</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 音乐博客. 用心分享音乐的美好.</p>
         </div>
-        <div class="game-board" id="game-board"></div>
-    </div>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>

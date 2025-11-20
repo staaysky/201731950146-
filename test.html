@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>响应式测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .viewport-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        iframe {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .mobile-frame {
+            width: 375px;
+            height: 667px;
+            margin: 0 auto;
+        }
+        .tablet-frame {
+            width: 768px;
+            height: 1024px;
+            margin: 0 auto;
+        }
+        .desktop-frame {
+            width: 1200px;
+            height: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="viewport-info">
+        <h2>当前视口信息</h2>
+        <p>宽度: <span id="viewport-width"></span>px</p>
+        <p>高度: <span id="viewport-height"></span>px</p>
+        <p>设备类型: <span id="device-type"></span></p>
+    </div>
+
+    <div class="test-container">
+        <h2>移动设备视图 (375x667)</h2>
+        <div class="mobile-frame">
+            <iframe src="index.html" height="667"></iframe>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>平板设备视图 (768x1024)</h2>
+        <div class="tablet-frame">
+            <iframe src="index.html" height="1024"></iframe>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>桌面设备视图 (1200x800)</h2>
+        <div class="desktop-frame">
+            <iframe src="index.html" height="800"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function updateViewportInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            let deviceType = '桌面设备';
+            
+            if (width <= 768) {
+                deviceType = '移动设备';
+            } else if (width <= 1024) {
+                deviceType = '平板设备';
+            }
+            
+            document.getElementById('viewport-width').textContent = width;
+            document.getElementById('viewport-height').textContent = height;
+            document.getElementById('device-type').textContent = deviceType;
+        }
+
+        updateViewportInfo();
+        window.addEventListener('resize', updateViewportInfo);
+
+        // 检查主页面是否加载正常
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach(iframe => {
+            iframe.addEventListener('load', function() {
+                console.log('页面加载完成:', iframe.src);
+            });
+            iframe.addEventListener('error', function() {
+                console.error('页面加载失败:', iframe.src);
+            });
+        });
+    </script>
+</body>
+</html>

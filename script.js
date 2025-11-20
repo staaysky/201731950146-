@@ -1,199 +1,347 @@
-class Gomoku {
+// 图片轮播功能
+class ImageCarousel {
     constructor() {
-        this.boardSize = 15;
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
+        this.slides = document.querySelectorAll('.carousel-slide');
+        this.currentSlide = 0;
+        this.slideInterval = null;
+        this.autoPlayDelay = 5000; // 5秒自动切换
         
         this.init();
     }
 
     init() {
-        this.createBoard();
-        this.renderBoard();
+        this.createIndicators();
         this.attachEventListeners();
-        this.updatePlayerDisplay();
+        this.startAutoPlay();
+        this.showSlide(0);
     }
 
-    createBoard() {
-        this.board = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(null));
-    }
-
-    renderBoard() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.innerHTML = '';
-        
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-                
-                if (this.board[row][col]) {
-                    const piece = document.createElement('div');
-                    piece.className = `piece ${this.board[row][col]}`;
-                    
-                    if (this.winningCells.some(([r, c]) => r === row && c === col)) {
-                        piece.classList.add('winning-piece');
-                    }
-                    
-                    cell.appendChild(piece);
-                    cell.classList.add('disabled');
-                }
-                
-                boardElement.appendChild(cell);
-            }
-        }
+    createIndicators() {
+        const indicatorsContainer = document.getElementById('carousel-indicators');
+        this.slides.forEach((_, index) => {
+            const indicator = document.createElement('div');
+            indicator.className = 'indicator';
+            if (index === 0) indicator.classList.add('active');
+            indicator.addEventListener('click', () => this.goToSlide(index));
+            indicatorsContainer.appendChild(indicator);
+        });
+        this.indicators = document.querySelectorAll('.indicator');
     }
 
     attachEventListeners() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.addEventListener('click', (e) => {
-            if (this.gameOver) return;
-            
-            const cell = e.target.closest('.cell');
-            if (!cell || cell.classList.contains('disabled')) return;
-            
-            const row = parseInt(cell.dataset.row);
-            const col = parseInt(cell.dataset.col);
-            
-            this.placePiece(row, col);
+        document.getElementById('prev-btn').addEventListener('click', () => this.prevSlide());
+        document.getElementById('next-btn').addEventListener('click', () => this.nextSlide());
+        
+        // 鼠标悬停时暂停自动播放
+        const carousel = document.querySelector('.carousel-container');
+        carousel.addEventListener('mouseenter', () => this.stopAutoPlay());
+        carousel.addEventListener('mouseleave', () => this.startAutoPlay());
+    }
+
+    showSlide(index) {
+        this.slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === index);
         });
-
-        document.getElementById('restart-btn').addEventListener('click', () => {
-            this.restart();
+        this.indicators.forEach((indicator, i) => {
+            indicator.classList.toggle('active', i === index);
         });
+        this.currentSlide = index;
     }
 
-    placePiece(row, col) {
-        if (this.board[row][col] !== null) return;
-        
-        this.board[row][col] = this.currentPlayer;
-        
-        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        const piece = document.createElement('div');
-        piece.className = `piece ${this.currentPlayer}`;
-        cell.appendChild(piece);
-        cell.classList.add('disabled');
-        
-        if (this.checkWin(row, col)) {
-            this.gameOver = true;
-            this.highlightWinningPieces();
-            this.showMessage(`${this.currentPlayer === 'black' ? '黑棋' : '白棋'} 获胜！`);
-            return;
+    nextSlide() {
+        const nextIndex = (this.currentSlide + 1) % this.slides.length;
+        this.showSlide(nextIndex);
+    }
+
+    prevSlide() {
+        const prevIndex = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+        this.showSlide(prevIndex);
+    }
+
+    goToSlide(index) {
+        this.showSlide(index);
+        this.resetAutoPlay();
+    }
+
+    startAutoPlay() {
+        this.stopAutoPlay();
+        this.slideInterval = setInterval(() => this.nextSlide(), this.autoPlayDelay);
+    }
+
+    stopAutoPlay() {
+        if (this.slideInterval) {
+            clearInterval(this.slideInterval);
+            this.slideInterval = null;
         }
-        
-        if (this.checkDraw()) {
-            this.gameOver = true;
-            this.showMessage('平局！');
-            return;
-        }
-        
-        this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
-        this.updatePlayerDisplay();
     }
 
-    checkWin(row, col) {
-        const directions = [
-            [0, 1],   // 水平
-            [1, 0],   // 垂直
-            [1, 1],   // 对角线
-            [1, -1]   // 反对角线
-        ];
-        
-        for (const [dx, dy] of directions) {
-            const cells = this.getLineCells(row, col, dx, dy);
-            if (cells.length >= 5) {
-                this.winningCells = cells;
-                return true;
-            }
-        }
-        
-        return false;
-    }
-
-    getLineCells(row, col, dx, dy) {
-        const player = this.board[row][col];
-        const cells = [[row, col]];
-        
-        // 正向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row + i * dx;
-            const newCol = col + i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
-            }
-        }
-        
-        // 反向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row - i * dx;
-            const newCol = col - i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
-            }
-        }
-        
-        return cells;
-    }
-
-    isValidPosition(row, col) {
-        return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
-    }
-
-    checkDraw() {
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                if (this.board[row][col] === null) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    highlightWinningPieces() {
-        this.renderBoard();
-    }
-
-    updatePlayerDisplay() {
-        const playerDisplay = document.getElementById('current-player');
-        playerDisplay.textContent = `当前玩家: ${this.currentPlayer === 'black' ? '黑棋' : '白棋'}`;
-    }
-
-    showMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.className = 'game-message';
-        messageElement.textContent = message;
-        messageElement.style.display = 'block';
-        document.body.appendChild(messageElement);
-        
-        setTimeout(() => {
-            messageElement.style.display = 'none';
-            document.body.removeChild(messageElement);
-        }, 3000);
-    }
-
-    restart() {
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
-        this.createBoard();
-        this.renderBoard();
-        this.updatePlayerDisplay();
+    resetAutoPlay() {
+        this.stopAutoPlay();
+        this.startAutoPlay();
     }
 }
 
-// 初始化游戏
+// 音乐播放器功能
+class MusicPlayer {
+    constructor() {
+        this.songs = [
+            {
+                title: '梦想的旋律',
+                artist: '未知艺术家',
+                duration: '3:45',
+                cover: 'https://picsum.photos/seed/album1/300/300.jpg'
+            },
+            {
+                title: '星空下的约定',
+                artist: '星光乐队',
+                duration: '4:12',
+                cover: 'https://picsum.photos/seed/album2/300/300.jpg'
+            },
+            {
+                title: '雨后彩虹',
+                artist: '自然之声',
+                duration: '3:28',
+                cover: 'https://picsum.photos/seed/album3/300/300.jpg'
+            },
+            {
+                title: '城市节拍',
+                artist: '都市节奏',
+                duration: '3:56',
+                cover: 'https://picsum.photos/seed/album4/300/300.jpg'
+            }
+        ];
+        
+        this.currentSongIndex = 0;
+        this.isPlaying = false;
+        this.currentTime = 0;
+        this.duration = 225; // 默认3:45的秒数
+        this.volume = 70;
+        this.isRepeat = false;
+        this.isShuffle = false;
+        this.progressInterval = null;
+        
+        this.init();
+    }
+
+    init() {
+        this.attachEventListeners();
+        this.loadSong(this.currentSongIndex);
+        this.updateVolumeDisplay();
+    }
+
+    attachEventListeners() {
+        // 播放/暂停按钮
+        document.getElementById('play-pause-btn').addEventListener('click', () => this.togglePlay());
+        
+        // 上一首/下一首
+        document.getElementById('prev-song-btn').addEventListener('click', () => this.prevSong());
+        document.getElementById('next-song-btn').addEventListener('click', () => this.nextSong());
+        
+        // 进度条
+        const progressBar = document.getElementById('progress-bar');
+        progressBar.addEventListener('click', (e) => this.seekTo(e));
+        
+        // 音量控制
+        const volumeSlider = document.getElementById('volume-slider');
+        volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
+        
+        // 重复和随机播放
+        document.getElementById('repeat-btn').addEventListener('click', () => this.toggleRepeat());
+        document.getElementById('shuffle-btn').addEventListener('click', () => this.toggleShuffle());
+        
+        // 播放列表点击
+        const songItems = document.querySelectorAll('.song-item');
+        songItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const songIndex = parseInt(item.dataset.song);
+                this.playSong(songIndex);
+            });
+        });
+    }
+
+    loadSong(index) {
+        const song = this.songs[index];
+        document.getElementById('song-title').textContent = song.title;
+        document.getElementById('artist-name').textContent = song.artist;
+        document.getElementById('album-cover').src = song.cover;
+        document.getElementById('total-time').textContent = song.duration;
+        
+        // 更新播放列表高亮
+        document.querySelectorAll('.song-item').forEach((item, i) => {
+            item.classList.toggle('active', i === index);
+        });
+        
+        // 重置进度
+        this.currentTime = 0;
+        this.updateProgress();
+        this.duration = this.parseDuration(song.duration);
+    }
+
+    parseDuration(durationStr) {
+        const [minutes, seconds] = durationStr.split(':').map(Number);
+        return minutes * 60 + seconds;
+    }
+
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    togglePlay() {
+        if (this.isPlaying) {
+            this.pause();
+        } else {
+            this.play();
+        }
+    }
+
+    play() {
+        this.isPlaying = true;
+        const playBtn = document.getElementById('play-pause-btn');
+        playBtn.textContent = '⏸️';
+        
+        const vinyl = document.getElementById('vinyl');
+        vinyl.classList.add('playing');
+        
+        // 模拟播放进度
+        this.progressInterval = setInterval(() => {
+            this.currentTime += 0.1;
+            if (this.currentTime >= this.duration) {
+                this.songEnded();
+            }
+            this.updateProgress();
+        }, 100);
+    }
+
+    pause() {
+        this.isPlaying = false;
+        const playBtn = document.getElementById('play-pause-btn');
+        playBtn.textContent = '▶️';
+        
+        const vinyl = document.getElementById('vinyl');
+        vinyl.classList.remove('playing');
+        
+        if (this.progressInterval) {
+            clearInterval(this.progressInterval);
+            this.progressInterval = null;
+        }
+    }
+
+    songEnded() {
+        this.pause();
+        if (this.isRepeat) {
+            this.play();
+        } else {
+            this.nextSong();
+        }
+    }
+
+    nextSong() {
+        if (this.isShuffle) {
+            let nextIndex;
+            do {
+                nextIndex = Math.floor(Math.random() * this.songs.length);
+            } while (nextIndex === this.currentSongIndex && this.songs.length > 1);
+            this.playSong(nextIndex);
+        } else {
+            const nextIndex = (this.currentSongIndex + 1) % this.songs.length;
+            this.playSong(nextIndex);
+        }
+    }
+
+    prevSong() {
+        const prevIndex = (this.currentSongIndex - 1 + this.songs.length) % this.songs.length;
+        this.playSong(prevIndex);
+    }
+
+    playSong(index) {
+        this.currentSongIndex = index;
+        this.loadSong(index);
+        if (this.isPlaying) {
+            this.play();
+        }
+    }
+
+    seekTo(event) {
+        const progressBar = document.getElementById('progress-bar');
+        const clickX = event.offsetX;
+        const width = progressBar.offsetWidth;
+        const percentage = clickX / width;
+        this.currentTime = percentage * this.duration;
+        this.updateProgress();
+    }
+
+    updateProgress() {
+        const progress = document.getElementById('progress');
+        const percentage = (this.currentTime / this.duration) * 100;
+        progress.style.width = `${percentage}%`;
+        
+        document.getElementById('current-time').textContent = this.formatTime(this.currentTime);
+    }
+
+    setVolume(value) {
+        this.volume = value;
+        this.updateVolumeDisplay();
+    }
+
+    updateVolumeDisplay() {
+        // 这里可以添加音量图标的更新逻辑
+    }
+
+    toggleRepeat() {
+        this.isRepeat = !this.isRepeat;
+        const repeatBtn = document.getElementById('repeat-btn');
+        repeatBtn.style.opacity = this.isRepeat ? '1' : '0.5';
+    }
+
+    toggleShuffle() {
+        this.isShuffle = !this.isShuffle;
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        shuffleBtn.style.opacity = this.isShuffle ? '1' : '0.5';
+    }
+}
+
+// 平滑滚动
+function smoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+}
+
+// 页面滚动效果
+function scrollEffects() {
+    const header = document.querySelector('.header');
+    let lastScrollTop = 0;
+    
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop && scrollTop > 100) {
+            // 向下滚动 - 隐藏header
+            header.style.transform = 'translateY(-100%)';
+        } else {
+            // 向上滚动 - 显示header
+            header.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollTop = scrollTop;
+    });
+}
+
+// 初始化所有功能
 document.addEventListener('DOMContentLoaded', () => {
-    new Gomoku();
+    new ImageCarousel();
+    new MusicPlayer();
+    smoothScroll();
+    scrollEffects();
 });
