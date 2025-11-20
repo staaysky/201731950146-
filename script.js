@@ -1,199 +1,208 @@
-class Gomoku {
+class Calendar {
     constructor() {
-        this.boardSize = 15;
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
+        this.currentDate = new Date();
+        this.selectedDate = null;
+        this.backgroundImages = [
+            'https://picsum.photos/seed/calendar1/1920/1080.jpg',
+            'https://picsum.photos/seed/calendar2/1920/1080.jpg',
+            'https://picsum.photos/seed/calendar3/1920/1080.jpg',
+            'https://picsum.photos/seed/calendar4/1920/1080.jpg',
+            'https://picsum.photos/seed/calendar5/1920/1080.jpg',
+            'https://picsum.photos/seed/calendar6/1920/1080.jpg',
+            'https://picsum.photos/seed/calendar7/1920/1080.jpg',
+            'https://picsum.photos/seed/calendar8/1920/1080.jpg',
+            'https://picsum.photos/seed/calendar9/1920/1080.jpg',
+            'https://picsum.photos/seed/calendar10/1920/1080.jpg'
+        ];
+        this.currentImageIndex = 0;
         
         this.init();
     }
 
     init() {
-        this.createBoard();
-        this.renderBoard();
+        this.renderCalendar();
         this.attachEventListeners();
-        this.updatePlayerDisplay();
+        this.updateTime();
+        this.updateBackground();
+        this.startBackgroundTimer();
+        this.startTimeTimer();
     }
 
-    createBoard() {
-        this.board = Array(this.boardSize).fill(null).map(() => Array(this.boardSize).fill(null));
+    renderCalendar() {
+        this.updateHeader();
+        this.renderDays();
     }
 
-    renderBoard() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.innerHTML = '';
+    updateHeader() {
+        const monthNames = [
+            '一月', '二月', '三月', '四月', '五月', '六月',
+            '七月', '八月', '九月', '十月', '十一月', '十二月'
+        ];
         
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-                
-                if (this.board[row][col]) {
-                    const piece = document.createElement('div');
-                    piece.className = `piece ${this.board[row][col]}`;
-                    
-                    if (this.winningCells.some(([r, c]) => r === row && c === col)) {
-                        piece.classList.add('winning-piece');
-                    }
-                    
-                    cell.appendChild(piece);
-                    cell.classList.add('disabled');
-                }
-                
-                boardElement.appendChild(cell);
+        const monthYearElement = document.getElementById('current-month-year');
+        monthYearElement.textContent = `${this.currentDate.getFullYear()}年 ${monthNames[this.currentDate.getMonth()]}`;
+    }
+
+    renderDays() {
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+        
+        const daysContainer = document.getElementById('calendar-days');
+        daysContainer.innerHTML = '';
+        
+        const today = new Date();
+        
+        // 上个月的日期
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const day = this.createDayElement(daysInPrevMonth - i, 'other-month', false);
+            daysContainer.appendChild(day);
+        }
+        
+        // 当前月的日期
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isToday = year === today.getFullYear() && 
+                           month === today.getMonth() && 
+                           day === today.getDate();
+            
+            const dayElement = this.createDayElement(day, 'current-month', isToday);
+            
+            if (isToday) {
+                dayElement.classList.add('today');
+            }
+            
+            daysContainer.appendChild(dayElement);
+        }
+        
+        // 下个月的日期
+        const totalCells = daysContainer.children.length;
+        const remainingCells = 42 - totalCells; // 6周 * 7天
+        
+        for (let day = 1; day <= remainingCells; day++) {
+            const dayElement = this.createDayElement(day, 'other-month', false);
+            daysContainer.appendChild(dayElement);
+        }
+    }
+
+    createDayElement(day, monthType, isToday) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'day';
+        dayElement.textContent = day;
+        
+        if (monthType === 'other-month') {
+            dayElement.classList.add('other-month');
+        }
+        
+        dayElement.addEventListener('click', () => {
+            this.selectDate(day, monthType);
+        });
+        
+        return dayElement;
+    }
+
+    selectDate(day, monthType) {
+        // 移除之前选中的日期
+        const previousSelected = document.querySelector('.day.selected');
+        if (previousSelected) {
+            previousSelected.classList.remove('selected');
+        }
+        
+        // 添加选中样式
+        event.target.classList.add('selected');
+        
+        // 设置选中日期
+        if (monthType === 'current-month') {
+            this.selectedDate = new Date(
+                this.currentDate.getFullYear(),
+                this.currentDate.getMonth(),
+                day
+            );
+        } else {
+            // 如果是其他月份的日期，切换到那个月份
+            if (day > 15) {
+                this.previousMonth();
+            } else {
+                this.nextMonth();
             }
         }
     }
 
     attachEventListeners() {
-        const boardElement = document.getElementById('game-board');
-        boardElement.addEventListener('click', (e) => {
-            if (this.gameOver) return;
-            
-            const cell = e.target.closest('.cell');
-            if (!cell || cell.classList.contains('disabled')) return;
-            
-            const row = parseInt(cell.dataset.row);
-            const col = parseInt(cell.dataset.col);
-            
-            this.placePiece(row, col);
+        document.getElementById('prev-month').addEventListener('click', () => {
+            this.previousMonth();
         });
-
-        document.getElementById('restart-btn').addEventListener('click', () => {
-            this.restart();
+        
+        document.getElementById('next-month').addEventListener('click', () => {
+            this.nextMonth();
         });
     }
 
-    placePiece(row, col) {
-        if (this.board[row][col] !== null) return;
-        
-        this.board[row][col] = this.currentPlayer;
-        
-        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        const piece = document.createElement('div');
-        piece.className = `piece ${this.currentPlayer}`;
-        cell.appendChild(piece);
-        cell.classList.add('disabled');
-        
-        if (this.checkWin(row, col)) {
-            this.gameOver = true;
-            this.highlightWinningPieces();
-            this.showMessage(`${this.currentPlayer === 'black' ? '黑棋' : '白棋'} 获胜！`);
-            return;
-        }
-        
-        if (this.checkDraw()) {
-            this.gameOver = true;
-            this.showMessage('平局！');
-            return;
-        }
-        
-        this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
-        this.updatePlayerDisplay();
+    previousMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+        this.renderCalendar();
     }
 
-    checkWin(row, col) {
-        const directions = [
-            [0, 1],   // 水平
-            [1, 0],   // 垂直
-            [1, 1],   // 对角线
-            [1, -1]   // 反对角线
-        ];
+    nextMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+        this.renderCalendar();
+    }
+
+    updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('zh-CN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
         
-        for (const [dx, dy] of directions) {
-            const cells = this.getLineCells(row, col, dx, dy);
-            if (cells.length >= 5) {
-                this.winningCells = cells;
-                return true;
-            }
-        }
+        const timeElement = document.getElementById('current-time');
+        timeElement.textContent = timeString;
+    }
+
+    startTimeTimer() {
+        setInterval(() => {
+            this.updateTime();
+        }, 1000);
+    }
+
+    updateBackground() {
+        const body = document.body;
+        const imageUrl = this.backgroundImages[this.currentImageIndex];
         
-        return false;
-    }
-
-    getLineCells(row, col, dx, dy) {
-        const player = this.board[row][col];
-        const cells = [[row, col]];
+        // 预加载图片
+        const img = new Image();
+        img.onload = () => {
+            body.style.backgroundImage = `url(${imageUrl})`;
+        };
+        img.src = imageUrl;
         
-        // 正向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row + i * dx;
-            const newCol = col + i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
-            }
-        }
+        // 更新索引
+        this.currentImageIndex = (this.currentImageIndex + 1) % this.backgroundImages.length;
         
-        // 反向检查
-        for (let i = 1; i < 5; i++) {
-            const newRow = row - i * dx;
-            const newCol = col - i * dy;
-            
-            if (this.isValidPosition(newRow, newCol) && this.board[newRow][newCol] === player) {
-                cells.push([newRow, newCol]);
-            } else {
-                break;
-            }
-        }
+        // 更新背景信息
+        const infoElement = document.getElementById('background-info');
+        const nextUpdateTime = new Date();
+        nextUpdateTime.setMinutes(nextUpdateTime.getMinutes() + 1);
+        infoElement.textContent = `背景图片每分钟自动更新 | 下次更新: ${nextUpdateTime.toLocaleTimeString('zh-CN', {
+            hour: '2-digit',
+            minute: '2-digit'
+        })}`;
+    }
+
+    startBackgroundTimer() {
+        // 立即更新一次背景
+        this.updateBackground();
         
-        return cells;
-    }
-
-    isValidPosition(row, col) {
-        return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
-    }
-
-    checkDraw() {
-        for (let row = 0; row < this.boardSize; row++) {
-            for (let col = 0; col < this.boardSize; col++) {
-                if (this.board[row][col] === null) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    highlightWinningPieces() {
-        this.renderBoard();
-    }
-
-    updatePlayerDisplay() {
-        const playerDisplay = document.getElementById('current-player');
-        playerDisplay.textContent = `当前玩家: ${this.currentPlayer === 'black' ? '黑棋' : '白棋'}`;
-    }
-
-    showMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.className = 'game-message';
-        messageElement.textContent = message;
-        messageElement.style.display = 'block';
-        document.body.appendChild(messageElement);
-        
-        setTimeout(() => {
-            messageElement.style.display = 'none';
-            document.body.removeChild(messageElement);
-        }, 3000);
-    }
-
-    restart() {
-        this.board = [];
-        this.currentPlayer = 'black';
-        this.gameOver = false;
-        this.winningCells = [];
-        this.createBoard();
-        this.renderBoard();
-        this.updatePlayerDisplay();
+        // 每分钟更新背景
+        setInterval(() => {
+            this.updateBackground();
+        }, 60000); // 60秒 = 1分钟
     }
 }
 
-// 初始化游戏
+// 初始化日历
 document.addEventListener('DOMContentLoaded', () => {
-    new Gomoku();
+    new Calendar();
 });
