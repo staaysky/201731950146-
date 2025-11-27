@@ -3,18 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>TechBlog - 科技美学博客</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
-        </div>
-        <div class="game-board" id="game-board"></div>
+    <!-- Theme Selector -->
+    <div class="theme-selector">
+        <button class="theme-btn active" data-theme="neon">
+            <i class="fas fa-bolt"></i> 霓虹科技
+        </button>
+        <button class="theme-btn" data-theme="minimal">
+            <i class="fas fa-circle"></i> 极简主义
+        </button>
+        <button class="theme-btn" data-theme="cyberpunk">
+            <i class="fas fa-robot"></i> 赛博朋克
+        </button>
+        <button class="theme-btn" data-theme="nature">
+            <i class="fas fa-leaf"></i> 自然科技
+        </button>
     </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-code"></i>
+                <span>TechBlog</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">首页</a></li>
+                <li><a href="#articles" class="nav-link">文章</a></li>
+                <li><a href="#about" class="nav-link">关于</a></li>
+                <li><a href="#contact" class="nav-link">联系</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="glitch" data-text="探索科技美学">探索科技美学</span>
+            </h1>
+            <p class="hero-subtitle">在代码与艺术之间，寻找完美的平衡点</p>
+            <div class="hero-buttons">
+                <a href="#articles" class="btn btn-primary">开始探索</a>
+                <a href="#about" class="btn btn-secondary">了解更多</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="code-animation">
+                <pre><code>&lt;tech&gt;
+  &lt;innovation/&gt;
+  &lt;design&gt;
+    &lt;aesthetic/&gt;
+  &lt;/design&gt;
+&lt;/tech&gt;</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Articles Section -->
+    <section id="articles" class="articles">
+        <div class="container">
+            <h2 class="section-title">最新文章</h2>
+            <div class="articles-grid">
+                <article class="article-card">
+                    <div class="article-image">
+                        <div class="image-placeholder">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span class="category">人工智能</span>
+                            <span class="date">2024-11-27</span>
+                        </div>
+                        <h3 class="article-title">深度学习在创意设计中的应用</h3>
+                        <p class="article-excerpt">探索AI如何革命性地改变创意设计领域，从图像生成到智能交互...</p>
+                        <a href="#" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <div class="image-placeholder">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span class="category">前端开发</span>
+                            <span class="date">2024-11-25</span>
+                        </div>
+                        <h3 class="article-title">现代CSS动画技术详解</h3>
+                        <p class="article-excerpt">深入了解CSS3动画、过渡效果和现代动画库的使用技巧...</p>
+                        <a href="#" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <div class="image-placeholder">
+                            <i class="fas fa-vr-cardboard"></i>
+                        </div>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span class="category">虚拟现实</span>
+                            <span class="date">2024-11-23</span>
+                        </div>
+                        <h3 class="article-title">WebXR技术的未来展望</h3>
+                        <p class="article-excerpt">探讨WebXR如何改变我们与数字世界的交互方式...</p>
+                        <a href="#" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <div class="image-placeholder">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span class="category">网络安全</span>
+                            <span class="date">2024-11-20</span>
+                        </div>
+                        <h3 class="article-title">零信任架构的实施策略</h3>
+                        <p class="article-excerpt">现代企业网络安全架构的最佳实践与实施指南...</p>
+                        <a href="#" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <div class="image-placeholder">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span class="category">云计算</span>
+                            <span class="date">2024-11-18</span>
+                        </div>
+                        <h3 class="article-title">容器化部署的最佳实践</h3>
+                        <p class="article-excerpt">Docker和Kubernetes在生产环境中的应用经验分享...</p>
+                        <a href="#" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <div class="image-placeholder">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span class="category">机器学习</span>
+                            <span class="date">2024-11-15</span>
+                        </div>
+                        <h3 class="article-title">神经网络的架构创新</h3>
+                        <p class="article-excerpt">从CNN到Transformer，深度学习模型的演进之路...</p>
+                        <a href="#" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">关于博客</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>科技与美学的完美融合</h3>
+                    <p>TechBlog致力于探索科技世界中的美学价值，分享最新的技术趋势、设计理念和创新思维。我们相信，优秀的代码不仅要功能强大，更要优雅美观。</p>
+                    <p>在这里，你将找到关于人工智能、前端开发、用户体验设计、云计算等领域的深度文章，以及我们对技术未来的思考与展望。</p>
+                    <div class="skills">
+                        <span class="skill-tag">JavaScript</span>
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">React</span>
+                        <span class="skill-tag">Node.js</span>
+                        <span class="skill-tag">Machine Learning</span>
+                        <span class="skill-tag">UI/UX Design</span>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <div class="tech-stack">
+                        <div class="stack-layer layer-1"></div>
+                        <div class="stack-layer layer-2"></div>
+                        <div class="stack-layer layer-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">联系我</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>让我们一起探讨科技的无限可能</h3>
+                    <p>如果你对技术有热情，对设计有追求，欢迎与我交流分享。</p>
+                    <div class="contact-methods">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>hello@techblog.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fab fa-github"></i>
+                            <span>github.com/techblog</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fab fa-twitter"></i>
+                            <span>@techblog</span>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <input type="text" placeholder="你的名字" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" placeholder="邮箱地址" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea placeholder="留言内容" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">发送消息</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-code"></i>
+                    <span>TechBlog</span>
+                </div>
+                <p>&copy; 2024 TechBlog. 探索科技之美，创造无限可能。</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
