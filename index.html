@@ -3,18 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>TechVista - 个人科技博客</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+<body class="cyber-theme">
+    <!-- 导航栏 -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TechVista</span>
+                <span class="logo-dot">.</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#home" class="nav-link active">首页</a>
+                <a href="#articles" class="nav-link">文章</a>
+                <a href="#projects" class="nav-link">项目</a>
+                <a href="#about" class="nav-link">关于</a>
+            </nav>
+            <div class="theme-switcher">
+                <button id="theme-btn" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
         </div>
-        <div class="game-board" id="game-board"></div>
-    </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- Hero 区域 -->
+        <section id="home" class="hero-section">
+            <div class="hero-background">
+                <div class="grid-overlay"></div>
+                <div class="floating-particles"></div>
+            </div>
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="title-line">探索数字世界</span>
+                    <span class="title-line">创造技术美学</span>
+                </h1>
+                <p class="hero-subtitle">专注于前端开发、UI/UX设计和技术创新</p>
+                <div class="hero-actions">
+                    <button class="btn-primary">探索文章</button>
+                    <button class="btn-secondary">联系我</button>
+                </div>
+                <div class="tech-stack">
+                    <span class="stack-item">React</span>
+                    <span class="stack-item">TypeScript</span>
+                    <span class="stack-item">Node.js</span>
+                    <span class="stack-item">Python</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 文章区域 -->
+        <section id="articles" class="articles-section">
+            <div class="section-header">
+                <h2 class="section-title">最新文章</h2>
+                <p class="section-subtitle">分享技术见解与开发经验</p>
+            </div>
+            <div class="articles-grid">
+                <article class="article-card">
+                    <div class="article-image">
+                        <div class="image-placeholder"></div>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span class="category">前端开发</span>
+                            <span class="date">2024-11-27</span>
+                        </div>
+                        <h3 class="article-title">构建高性能 React 应用的最佳实践</h3>
+                        <p class="article-excerpt">探讨如何通过代码分割、懒加载和状态优化来提升 React 应用的性能...</p>
+                        <div class="article-footer">
+                            <span class="read-time">5 分钟阅读</span>
+                            <a href="#" class="read-more">阅读更多 →</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <div class="image-placeholder"></div>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span class="category">设计系统</span>
+                            <span class="date">2024-11-25</span>
+                        </div>
+                        <h3 class="article-title">现代 UI 设计系统的构建与维护</h3>
+                        <p class="article-excerpt">从零开始构建可扩展的设计系统，确保产品的一致性和开发效率...</p>
+                        <div class="article-footer">
+                            <span class="read-time">8 分钟阅读</span>
+                            <a href="#" class="read-more">阅读更多 →</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <div class="image-placeholder"></div>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span class="category">后端技术</span>
+                            <span class="date">2024-11-20</span>
+                        </div>
+                        <h3 class="article-title">微服务架构下的 API 网关设计</h3>
+                        <p class="article-excerpt">深入分析微服务架构中 API 网关的作用、设计模式和最佳实践...</p>
+                        <div class="article-footer">
+                            <span class="read-time">12 分钟阅读</span>
+                            <a href="#" class="read-more">阅读更多 →</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 项目展示 -->
+        <section id="projects" class="projects-section">
+            <div class="section-header">
+                <h2 class="section-title">精选项目</h2>
+                <p class="section-subtitle">展示我的技术作品集</p>
+            </div>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">🚀</div>
+                        <h3 class="project-title">智能任务管理系统</h3>
+                    </div>
+                    <p class="project-description">基于 AI 的任务优先级智能分析和团队协作平台</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">Node.js</span>
+                        <span class="tech-tag">MongoDB</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">查看演示</a>
+                        <a href="#" class="project-link">源代码</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">🎨</div>
+                        <h3 class="project-title">响应式设计系统</h3>
+                    </div>
+                    <p class="project-description">企业级组件库，支持多主题定制和跨平台应用</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">TypeScript</span>
+                        <span class="tech-tag">Storybook</span>
+                        <span class="tech-tag">Sass</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">查看演示</a>
+                        <a href="#" class="project-link">文档</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">📊</div>
+                        <h3 class="project-title">数据可视化平台</h3>
+                    </div>
+                    <p class="project-description">实时数据监控和交互式图表分析系统</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">Vue.js</span>
+                        <span class="tech-tag">D3.js</span>
+                        <span class="tech-tag">Python</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">查看演示</a>
+                        <a href="#" class="project-link">源代码</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于我 -->
+        <section id="about" class="about-section">
+            <div class="about-container">
+                <div class="about-content">
+                    <h2 class="about-title">关于我</h2>
+                    <p class="about-text">
+                        我是一名充满激情的全栈开发者，专注于创建美观且功能强大的 Web 应用程序。
+                        拥有 5 年的开发经验，精通现代前端框架和后端技术栈。
+                    </p>
+                    <p class="about-text">
+                        我相信技术与美学的完美结合能够创造出令人惊叹的用户体验。
+                        在业余时间，我喜欢探索新技术、参与开源项目，并通过博客分享我的学习心得。
+                    </p>
+                    <div class="skills-section">
+                        <h3 class="skills-title">技术栈</h3>
+                        <div class="skills-grid">
+                            <div class="skill-category">
+                                <h4>前端</h4>
+                                <div class="skill-tags">
+                                    <span class="skill-tag">React</span>
+                                    <span class="skill-tag">Vue.js</span>
+                                    <span class="skill-tag">TypeScript</span>
+                                    <span class="skill-tag">Tailwind CSS</span>
+                                </div>
+                            </div>
+                            <div class="skill-category">
+                                <h4>后端</h4>
+                                <div class="skill-tags">
+                                    <span class="skill-tag">Node.js</span>
+                                    <span class="skill-tag">Python</span>
+                                    <span class="skill-tag">PostgreSQL</span>
+                                    <span class="skill-tag">Redis</span>
+                                </div>
+                            </div>
+                            <div class="skill-category">
+                                <h4>工具</h4>
+                                <div class="skill-tags">
+                                    <span class="skill-tag">Git</span>
+                                    <span class="skill-tag">Docker</span>
+                                    <span class="skill-tag">AWS</span>
+                                    <span class="skill-tag">Figma</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-dot red"></span>
+                            <span class="code-dot yellow"></span>
+                            <span class="code-dot green"></span>
+                            <span class="code-title">developer.js</span>
+                        </div>
+                        <pre class="code-content"><code>const developer = {
+  name: "Tech Enthusiast",
+  skills: ["React", "Node.js", "Python"],
+  passion: "Creating beautiful experiences",
+  currentFocus: "AI & Web Development",
+  learning: () => {
+    return "Never stop growing";
+  }
+};</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>TechVista</h3>
+                <p>探索技术，创造美学</p>
+            </div>
+            <div class="footer-section">
+                <h4>快速链接</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">首页</a></li>
+                    <li><a href="#articles">文章</a></li>
+                    <li><a href="#projects">项目</a></li>
+                    <li><a href="#about">关于</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>社交媒体</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link">GitHub</a>
+                    <a href="#" class="social-link">LinkedIn</a>
+                    <a href="#" class="social-link">Twitter</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TechVista. All rights reserved.</p>
+        </div>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
