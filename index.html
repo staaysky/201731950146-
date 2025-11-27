@@ -3,18 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五子棋游戏</title>
+    <title>个人博客 - 科技唯美感</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>五子棋游戏</h1>
-        <div class="game-info">
-            <div id="current-player">当前玩家: 黑棋</div>
-            <button id="restart-btn">重新开始</button>
+    <div class="cursor"></div>
+    
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <span class="brand-text">Blog<span class="brand-dot">.</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#home" class="nav-link">首页</a></li>
+                <li class="nav-item"><a href="#about" class="nav-link">关于</a></li>
+                <li class="nav-item"><a href="#posts" class="nav-link">文章</a></li>
+                <li class="nav-item"><a href="#contact" class="nav-link">联系</a></li>
+            </ul>
+            <div class="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="title-line">探索科技</span>
+                    <span class="title-line">创造美学</span>
+                </h1>
+                <p class="hero-subtitle">在代码与艺术之间，寻找完美的平衡点</p>
+                <div class="hero-buttons">
+                    <a href="#posts" class="btn btn-primary">开始阅读</a>
+                    <a href="#about" class="btn btn-secondary">了解更多</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="floating-elements">
+                    <div class="float-element element-1"></div>
+                    <div class="float-element element-2"></div>
+                    <div class="float-element element-3"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">关于我</h2>
+                    <div class="section-line"></div>
+                </div>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p class="about-intro">
+                            我是一名热爱技术与设计的开发者，专注于创造既美观又实用的数字体验。
+                        </p>
+                        <p>
+                            在这个博客中，我分享关于前端开发、UI/UX设计、人工智能等领域的思考与实践。
+                            相信技术的力量不仅在于解决问题，更在于创造美。
+                        </p>
+                        <div class="skills">
+                            <div class="skill-tag">前端开发</div>
+                            <div class="skill-tag">UI设计</div>
+                            <div class="skill-tag">人工智能</div>
+                            <div class="skill-tag">创意编程</div>
+                        </div>
+                    </div>
+                    <div class="about-visual">
+                        <div class="avatar-container">
+                            <div class="avatar"></div>
+                            <div class="avatar-ring"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="posts" class="posts">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">最新文章</h2>
+                    <div class="section-line"></div>
+                </div>
+                <div class="posts-grid">
+                    <article class="post-card">
+                        <div class="post-image">
+                            <div class="post-overlay"></div>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date">2024-11-27</span>
+                                <span class="post-category">技术</span>
+                            </div>
+                            <h3 class="post-title">现代前端架构设计原则</h3>
+                            <p class="post-excerpt">探讨如何构建可扩展、可维护的前端应用架构，包括组件化设计、状态管理等核心概念。</p>
+                            <a href="#" class="read-more">阅读更多 <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+
+                    <article class="post-card">
+                        <div class="post-image">
+                            <div class="post-overlay"></div>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date">2024-11-25</span>
+                                <span class="post-category">设计</span>
+                            </div>
+                            <h3 class="post-title">极简主义在UI设计中的应用</h3>
+                            <p class="post-excerpt">从极简主义哲学出发，分析如何在用户界面中实现"少即是多"的设计理念。</p>
+                            <a href="#" class="read-more">阅读更多 <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+
+                    <article class="post-card">
+                        <div class="post-image">
+                            <div class="post-overlay"></div>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date">2024-11-23</span>
+                                <span class="post-category">AI</span>
+                            </div>
+                            <h3 class="post-title">人工智能与创意设计的融合</h3>
+                            <p class="post-excerpt">探索AI工具如何改变创意设计流程，以及设计师如何与AI协作创造更优秀的作品。</p>
+                            <a href="#" class="read-more">阅读更多 <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">联系我</h2>
+                    <div class="section-line"></div>
+                </div>
+                <div class="contact-content">
+                    <div class="contact-info">
+                        <h3>让我们一起创造精彩</h3>
+                        <p>如果你对我的项目感兴趣，或者想要合作，欢迎随时联系我。</p>
+                        <div class="contact-methods">
+                            <div class="contact-method">
+                                <i class="fas fa-envelope"></i>
+                                <span>hello@example.com</span>
+                            </div>
+                            <div class="contact-method">
+                                <i class="fab fa-github"></i>
+                                <span>github.com/username</span>
+                            </div>
+                            <div class="contact-method">
+                                <i class="fab fa-twitter"></i>
+                                <span>@username</span>
+                            </div>
+                        </div>
+                    </div>
+                    <form class="contact-form">
+                        <div class="form-group">
+                            <input type="text" placeholder="你的名字" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="邮箱地址" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea placeholder="留言内容" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">发送消息</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 个人博客. 用心创造，用爱分享.</p>
         </div>
-        <div class="game-board" id="game-board"></div>
-    </div>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
